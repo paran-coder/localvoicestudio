@@ -1,0 +1,6 @@
+{
+  "buildCommand": "node 2026-10-22-build.mjs",
+  "outputDirectory": "public",
+  "installCommand": "",
+  "headers": [{"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"}]}]
+}

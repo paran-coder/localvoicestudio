@@ -1,0 +1,15 @@
+import {mkdir,readFile,writeFile,copyFile,cp} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.dirname(fileURLToPath(import.meta.url));
+let site=process.env.SITE_URL||process.env.VERCEL_PROJECT_PRODUCTION_URL||process.env.VERCEL_URL;
+if(!site) throw new Error('Set SITE_URL to the public HTTPS domain (or deploy on Vercel).');
+if(!site.includes('://')) site='https://'+site;
+const url=new URL(site);if(!['https:','http:'].includes(url.protocol)||url.username||url.password)throw new Error('Invalid SITE_URL');
+const origin=url.origin;const out=path.join(root,'public');await mkdir(out,{recursive:true});
+const html=(await readFile(path.join(root,'index.html'),'utf8')).replaceAll('__SITE_URL__',origin);
+await writeFile(path.join(out,'index.html'),html);await copyFile(path.join(root,'og-image.png'),path.join(out,'og-image.png'));
+await cp(path.join(root,'downloads'),path.join(out,'downloads'),{recursive:true});
+await writeFile(path.join(out,'robots.txt'),'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
+await writeFile(path.join(out,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+origin+'/</loc></url></urlset>');
+console.log('Built static website for '+origin);

@@ -1,0 +1,1156 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local AI TTS · 더빙 스튜디오</title>
+
+
+
+
+
+
+
+
+
+
+
+<style>
+
+
+
+
+
+
+
+
+
+
+
+:root{color-scheme:light;font:15px/1.65 system-ui,sans-serif;background:#f5f5f5;color:#181a20}*{box-sizing:border-box}body{margin:0}main{max-width:1180px;margin:auto;padding:34px 24px}header{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #eaecef;padding-bottom:24px}h1{font-size:30px;margin:0;letter-spacing:-1px}h2{font-size:19px;margin:0 0 18px}p{color:#59616d}.tag{color:#181a20;background:#eaecef;padding:6px 12px;border-radius:20px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}.card{background:#ffffff;border:1px solid #eaecef;border-radius:16px;padding:24px}label{display:block;color:#474f5b;margin:12px 0 6px;font-size:13px}input,select,textarea{width:100%;background:#ffffff;color:#181a20;border:1px solid #cdd1d6;border-radius:8px;padding:11px;font:inherit}textarea{min-height:110px;resize:vertical}input[type=range]{padding:0;accent-color:#9a7300}input[type=checkbox]{width:auto}button,.download{border:0;border-radius:8px;padding:11px 17px;background:#ffffff;color:#fff;font:600 14px system-ui;cursor:pointer;display:inline-block;text-decoration:none}button.primary{background:#fcd535}button:disabled{opacity:.45;cursor:wait}button:hover:not(:disabled),.download:hover{filter:brightness(1.15)}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #795b00;outline-offset:2px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.muted{color:#59616d;font-size:12px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:620px}th{text-align:left;color:#59616d;font-size:12px;padding:10px}td{padding:5px;border-top:1px solid #eaecef}td input{min-width:74px}td textarea{min-height:66px}td:nth-child(1),td:nth-child(2){width:100px}td:last-child{width:64px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#fafafa;border-radius:8px;padding:16px;max-height:230px;overflow:auto;font-size:12px}#error{color:#b42318}audio{width:100%;margin-top:16px}.step{color:#181a20;font-size:12px;letter-spacing:2px;margin-bottom:8px}footer{margin:25px 0;color:#59616d;font-size:12px}@media(max-width:760px){.grid{grid-template-columns:1fr}header{align-items:flex-start}h1{font-size:24px}.card{padding:18px}main{padding:20px 14px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+
+
+
+
+
+
+
+
+
+
+/* v1.1.0: compact rows, native disclosure, bounded list scroll */
+
+
+
+
+
+
+
+
+
+
+
+.script-panel{margin-top:16px;border:1px solid #eaecef;border-radius:10px;overflow:hidden}
+
+
+
+
+
+
+
+
+
+
+
+.script-panel>summary{display:flex;align-items:center;gap:10px;justify-content:space-between;list-style:none;cursor:pointer;padding:12px 14px;background:#f5f5f5;font-weight:600;min-height:48px}
+
+
+
+
+
+
+
+
+
+
+
+.script-panel>summary::-webkit-details-marker{display:none}
+
+
+
+
+
+
+
+
+
+
+
+.script-panel>summary:focus-visible{outline:3px solid #795b00;outline-offset:-3px}
+
+
+
+
+
+
+
+
+
+
+
+.script-toggle{display:flex;align-items:center;gap:8px;color:#474f5b;font-size:13px}
+
+
+
+
+
+
+
+
+
+
+
+#script-summary{padding:10px 14px;font-size:13px;color:#474f5b}
+
+
+
+
+
+
+
+
+
+
+
+#script-summary:empty{display:none}
+
+
+
+
+
+
+
+
+
+
+
+#script-table{max-height:450px;overflow:auto;scrollbar-gutter:stable}
+
+
+
+
+
+
+
+
+
+
+
+#script-table table{table-layout:fixed;min-width:780px;width:100%}
+
+
+
+
+
+
+
+
+
+
+
+#script-table th:nth-child(1),#script-table th:nth-child(2),#script-table td:nth-child(1),#script-table td:nth-child(2){width:100px}
+
+
+
+
+
+
+
+
+
+
+
+#script-table th:last-child,#script-table td:last-child{width:88px}
+
+
+
+
+
+
+
+
+
+
+
+#script-table thead th{position:sticky;top:0;z-index:1;background:#f5f5f5;padding:10px 6px}
+
+
+
+
+
+
+
+
+
+
+
+#script-table td{padding:6px;vertical-align:top}
+
+
+
+
+
+
+
+
+
+
+
+#script-table input:not([type=checkbox]){height:44px;min-width:0;width:100%;padding:10px;line-height:22px}
+
+
+
+
+
+
+
+
+
+
+
+#script-table textarea{height:44px;min-height:44px;width:100%;padding:10px;line-height:22px;resize:none;overflow:hidden;display:block}
+
+
+
+
+
+
+
+
+
+
+
+#script-table .delete-row{height:44px;min-height:44px;width:100%;padding:0 10px;white-space:nowrap;word-break:keep-all}
+
+
+
+
+
+
+
+
+
+
+
+/* UI patch v1.1.1: separate speaker controls without changing synthesis. */
+
+
+
+
+
+
+
+
+
+.voice-speakers{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid #eaecef}
+
+
+
+
+
+
+
+
+
+#speakers{display:grid;gap:16px;margin:16px 0}
+
+
+
+
+
+
+
+
+
+.speaker-card{display:grid;gap:12px;min-width:0;padding:16px;border:1px solid #cdd1d6;border-radius:10px;background:#fafafa}
+
+
+
+
+
+
+
+
+
+.speaker-card label{margin:0}
+
+
+
+
+
+
+
+
+
+.speaker-card input{min-width:0;max-width:100%}
+
+
+
+
+
+
+
+
+
+.speaker-card input[type=file]{display:block;overflow:hidden}
+
+
+
+
+
+
+
+
+
+.speaker-card button{justify-self:start;margin:0;min-height:44px}
+
+
+
+
+
+
+
+
+
+.speaker-add-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+
+
+
+
+
+
+
+
+
+.voice-speakers+label{margin-top:0}
+
+
+
+
+
+
+
+
+
+/* UI patch v1.1.2: dedicated row selection column. */
+
+
+
+
+
+
+
+#script-table th:nth-child(1),#script-table td:nth-child(1){width:64px}
+
+
+
+
+
+
+
+#script-table th:nth-child(2),#script-table td:nth-child(2),#script-table th:nth-child(3),#script-table td:nth-child(3){width:100px}
+
+
+
+
+
+
+
+#script-table .pick-cell{text-align:center}
+
+
+
+
+
+
+
+#script-table td.pick-cell{padding-top:18px}
+
+
+
+
+
+
+
+#script-table input[type=checkbox]{appearance:auto;width:18px!important;height:18px;min-width:18px;padding:0;margin:0;accent-color:#9a7300;vertical-align:middle;cursor:pointer}
+
+
+
+
+
+
+
+#script-table .pick-label{display:flex;align-items:center;justify-content:center;gap:5px;margin:0;font-size:12px}
+
+
+
+
+
+
+
+#script-table .row-speaker{height:44px;min-width:0;width:100%;padding:10px;line-height:22px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* UI v1.3.1 — light workspace, Binance-derived neutral/yellow tokens. */
+
+
+
+
+
+:root{--canvas:#f5f5f5;--surface:#fff;--ink:#181a20;--muted:#59616d;--line:#eaecef;--brand:#fcd535;--brand-active:#f0b90b;color-scheme:light;font:14px/1.6 "Segoe UI","Malgun Gothic",system-ui,sans-serif;background:var(--canvas);color:var(--ink)}
+
+
+
+
+
+main{max-width:1280px;padding:32px 32px 24px}header{border:0;padding-bottom:24px;align-items:center}h1{font-size:28px;font-weight:700;line-height:1.25;letter-spacing:-.7px}header p{font-size:14px;line-height:1.6;margin-top:10px;color:var(--muted)}h2{font-size:20px;line-height:1.35;font-weight:600;margin:0 0 20px;letter-spacing:-.35px}p{font-size:14px;color:var(--muted)}.step{font-size:11px;letter-spacing:1px;color:var(--muted);font-weight:600;margin-bottom:8px}.tag{background:#fff;border:1px solid #cdd1d6;border-radius:6px;color:#474f5b;font-size:11px;font-weight:600;white-space:nowrap}.workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:24px}.workflow a{padding:14px 20px;color:#474f5b;text-decoration:none;font-size:13px;border-right:1px solid var(--line)}.workflow a:last-child{border:0}.workflow b{font-variant-numeric:tabular-nums;margin-right:10px;color:var(--ink)}.workflow a:hover{background:#fafafa}.grid{gap:24px;margin:24px 0;align-items:start}.card{border-color:#e3e5e8;border-radius:10px;padding:28px;box-shadow:0 1px 2px #181a2005;min-width:0}label{font-size:14px;font-weight:500;color:#474f5b;margin-top:16px}input,select,textarea{font:400 14px/1.5 "Segoe UI","Malgun Gothic",system-ui,sans-serif;border-radius:6px;border-color:#cdd1d6;color:var(--ink);background:#fff}input::placeholder,textarea::placeholder{color:#707a8a}input[type=number]{font-variant-numeric:tabular-nums}input[type=checkbox],input[type=range]{accent-color:#795b00}input[type=file]{font-size:13px;padding:10px}input[type=file]::file-selector-button{border:1px solid #cdd1d6;border-radius:4px;background:#f5f5f5;color:#181a20;font:600 12px "Segoe UI",sans-serif;padding:6px 10px;margin-right:10px}button,.download{background:#fff;color:#181a20;border:1px solid #cdd1d6;border-radius:6px;min-height:44px;font:600 14px/1.3 "Segoe UI","Malgun Gothic",sans-serif;padding:11px 16px}button:hover:not(:disabled),.download:hover{filter:none;background:#f5f5f5}button.primary{background:var(--brand);border-color:var(--brand);color:#181a20}button.primary:hover:not(:disabled){background:var(--brand-active);border-color:var(--brand-active)}button.secondary-strong{background:#181a20;border-color:#181a20;color:#fff}button.secondary-strong:hover:not(:disabled){background:#2b3139}button:disabled{opacity:.55}.actions{align-items:center;gap:10px}.actions>select{width:auto;min-width:180px;flex:1}.muted{font-size:13px;line-height:1.65;color:var(--muted)}.help-details{margin:12px 0;color:var(--muted);font-size:13px}.help-details summary{cursor:pointer;font-weight:500}.help-details p{padding:12px;background:#fafafa;border:1px solid var(--line);border-radius:6px}.voice-speakers summary{font-size:14px;font-weight:600;cursor:pointer}.speaker-card{background:#fafafa;border-color:#e3e5e8;border-radius:8px;box-shadow:none}.speaker-add-actions{margin-top:16px}.script-panel{border-color:#d9dde2;border-radius:8px}.script-panel>summary{background:#f5f5f5;color:#181a20;font-size:14px}.script-toggle{color:#59616d}#script-summary{color:#474f5b;background:#fff;font-size:13px}#script-table thead th{background:#fafafa;color:#474f5b;font-size:12px;font-weight:600;border-bottom:1px solid #d9dde2}#script-table td{border-color:#eaecef}#script-table tr:has(.row-pick:checked){background:#fffbea}#script-table input[type=checkbox]{accent-color:#795b00}#script-table .delete-row{font-size:12px;color:#59616d;background:transparent;border-color:#eaecef}#script-table .delete-row:hover{color:#b42318;background:#fff1f0;border-color:#f0c8c5}.generation-heading{border-top:1px solid var(--line);padding-top:24px;margin-top:28px;scroll-margin-top:20px}.generation-heading h2{margin-bottom:8px}.generation-heading p{margin:0 0 20px}.editor-card>.actions:last-child{padding-top:16px;border-top:1px solid var(--line);margin-top:20px}#generate-button{min-width:200px}#state{font-size:15px;font-weight:600;line-height:1.6}#extract-status{padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:#fafafa;font-size:13px}pre{background:#fafafa;border:1px solid var(--line);color:#474f5b;font:12px/1.6 Consolas,monospace;border-radius:6px}#error{color:#b42318}#error:not(:empty){padding:12px;background:#fff1f0;border:1px solid #f0c8c5;border-radius:6px}#results:empty:before{content:"생성이 완료되면 음성과 자막 파일이 여기에 표시됩니다.";display:block;border:1px dashed #cdd1d6;border-radius:8px;padding:24px 16px;color:#59616d;font-size:13px}#results>div{padding:16px 0;border-top:1px solid var(--line)}.download{font-size:12px;min-height:36px;margin:4px 0;overflow-wrap:anywhere;max-width:100%}footer{color:#59616d;border-top:1px solid #e3e5e8;padding-top:20px;font-size:12px}summary:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #795b00;outline-offset:3px}#source-panel,#voice-panel,#editor-panel{scroll-margin-top:20px}
+
+
+
+
+
+@media(max-width:1000px){main{padding:24px}.card{padding:24px}.workflow a{padding:12px;font-size:12px}}
+
+
+
+
+
+@media(max-width:760px){main{padding:20px 14px}.grid{grid-template-columns:1fr;gap:20px}.card{padding:20px}h1{font-size:24px}header{gap:12px;align-items:flex-start}.workflow{grid-template-columns:1fr 1fr}.workflow a{border-bottom:1px solid var(--line)}.workflow a:nth-child(2){border-right:0}.workflow a:nth-child(3),.workflow a:nth-child(4){border-bottom:0}.row{grid-template-columns:1fr;gap:0}.actions>*{max-width:100%}#generate-button{width:100%}.tag{font-size:10px;padding:5px 8px}}
+
+
+
+
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+
+
+
+
+
+
+
+/* UI v1.3.1: clearer workspace and panel separation. */
+
+
+
+:root{--canvas:#eaecf0;--line:#d5d9df;background:var(--canvas)}
+
+
+
+.card{background:#fff;border-color:#d5d9df;box-shadow:0 2px 6px rgba(24,26,32,.045)}
+
+
+
+.workflow{border-color:#d5d9df;background:#fff}
+
+
+
+.speaker-card,.help-details p,pre,#extract-status{background:#f7f8fa;border-color:#d5d9df}
+
+
+
+.script-panel{border-color:#d5d9df;background:#fff}
+
+
+
+.script-panel>summary,#script-table thead th{background:#f7f8fa}
+
+
+
+footer{border-color:#cdd1d6}
+
+
+
+
+
+/* UI v1.3.1: equal-height sibling cards and inset script toolbar. */
+
+main>.grid{align-items:stretch}
+
+#script-panel>.actions{margin:0;padding:16px;border-bottom:1px solid #eaecef;background:#fff;gap:12px}
+
+#script-panel>.actions>select{flex:1 1 220px;min-width:0}
+
+#script-panel>.actions>button{flex:0 0 auto;white-space:nowrap}
+
+#script-empty{margin:0;padding:28px 20px;text-align:center;font-size:13px;color:#59616d;background:#fafbfc}
+
+#script-empty[hidden],#script-table[hidden]{display:none}
+
+#script-table table{margin:0}
+
+@media(max-width:760px){main>.grid{align-items:start}#script-panel>.actions{padding:12px}#script-panel>.actions>select,#script-panel>.actions>button{width:100%;flex-basis:100%}}
+
+/* UI v1.3.1: named tracks and result hierarchy. */
+.result-group{padding:20px 0;border-top:1px solid #d5d9df;margin-top:16px;min-width:0}.result-group h3{font-size:16px;line-height:1.4;margin:0 0 8px;font-weight:600}.result-group h4{font-size:14px;margin:0 0 10px;font-weight:600}.result-group p{margin:0 0 12px}.speaker-result{padding:16px;background:#f7f8fa;border:1px solid #e3e5e8;border-radius:8px;margin:12px 0}.result-group audio{margin:12px 0 0}.result-group .download{white-space:normal;overflow-wrap:anywhere}
+</style><main><header><div><div class="step">LOCAL VOICE STUDIO</div><h1>다국어 더빙 스튜디오</h1><p style="margin-bottom:0">원본을 가져오고, 대사를 다듬어 원하는 목소리로 더빙하세요.</p></div><span class="tag">UI v1.3.1 · LOCAL</span></header><nav class="workflow" aria-label="더빙 작업 순서"><a href="#source-panel"><b>01</b> 원본 가져오기</a><a href="#voice-panel"><b>02</b> 목소리 설정</a><a href="#editor-panel"><b>03</b> 대본·번역</a><a href="#generation-panel"><b>04</b> 음성 생성</a></nav><div id="connection-notice" role="alert" hidden style="margin:18px 0;padding:16px;background:#fff1f0;border:1px solid #d92d20;border-radius:10px"></div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="grid"><section class="card" id="source-panel"><div class="step">01 / SOURCE</div><h2>원본 가져오기</h2><label for="url">YouTube 링크</label><input id="url" placeholder="https://www.youtube.com/watch?v=…" type="url"><label for="media">또는 영상·음성 파일 (최대 200MB)</label><input id="media" type="file" accept="audio/*,video/*"><div class="row"><div><label for="source_language">원본 언어</label><select id="source_language"></select></div><div><label for="whisper">Whisper 정밀도</label><select id="whisper"><option value="tiny">Tiny · 빠르게</option><option value="base" selected>Base · 기본</option><option value="small">Small · 정밀</option><option value="medium">Medium · 더 정밀</option></select></div></div><div class="actions"><button class="primary" id="extract-button" onclick="extract()">자막 / 음성 추출</button></div><div id="extract-status" role="status" aria-live="polite" style="margin-top:14px;white-space:pre-wrap">서버 연결을 확인하고 있습니다…</div><p class="muted">링크의 자막을 먼저 사용합니다. 자막이 없으면 Whisper로 인식합니다. 링크와 파일이 모두 있으면 링크를 사용합니다.</p></section>
+
+
+
+
+
+
+
+
+
+
+
+<section class="card" id="voice-panel"><div class="step">02 / VOICE</div><h2>목소리 설정</h2><details class="voice-speakers"><summary>여러 인물로 더빙하기</summary><p class="muted">인물마다 참조 음성을 선택하고 자막의 화자를 지정하세요. 샘플이 없으면 기본 목소리로 생성됩니다. 자동 화자 인식은 하지 않습니다.</p><div id="speakers"></div><div class="speaker-add-actions"><button onclick="addSpeaker()">인물 추가</button></div></details><label for="voice">내 목소리 샘플 · 권장 10~30초</label><input id="voice" type="file" accept="audio/*,video/*"><label><input type="checkbox" id="consent"> 본인 또는 사용 허락을 받은 목소리입니다.</label><p class="muted">인물을 등록하지 않았을 때 사용하는 샘플입니다. 여러 인물 모드에서는 각 인물의 샘플을 사용하며, 없는 인물은 기본 목소리로 생성합니다.</p><div class="row"><div><label for="emotion">감정 세기 <output id="emotionValue">0.5</output></label><input id="emotion" type="range" min="0" max="1" step="0.05" value="0.5" oninput="emotionValue.value=this.value"></div><div><label for="cfg">CFG <output id="cfgValue">0.5</output></label><input id="cfg" type="range" min="0" max="1" step="0.05" value="0.5" oninput="cfgValue.value=this.value"></div></div><p class="muted">CFG는 생성 지침 강도입니다. 정확한 말하기 속도 조절값은 아닙니다.</p></section></div>
+
+
+
+
+
+
+
+
+
+
+
+<section class="card editor-card" id="editor-panel"><div class="step">03 / SCRIPT</div><h2>대본과 번역 편집</h2><label for="text">직접 입력하여 시작하기</label><textarea id="text" placeholder="안녕하세요. 새로운 언어로 여러분의 이야기를 전해 보세요."></textarea><div class="actions"><button onclick="useText()">입력한 문장을 구간으로 추가</button><button onclick="addRow(0,5,'')">빈 구간 추가</button></div><p class="muted">Enter: 구간 분리 · Shift+Enter: 줄바꿈 · 행 시작 Backspace: 앞 구간과 합치기 · Ctrl+Z: 구간 편집 되돌리기. 분리 시 시간은 글자 비율로 추정하므로 확인하세요.</p><div class="actions"><button id="undo-edit" onclick="undoSubtitleEdit()" disabled>구간 편집 되돌리기</button></div><p class="muted">아래 문장이 실제로 읽힙니다. 번역 결과도 여기에서 검토·수정하세요. 구간은 겹치지 않게 설정하세요.</p><details id="script-panel" class="script-panel" open><summary><span id="script-count">자막 0개</span><span class="script-toggle"><span id="script-toggle-label">접기</span><span id="script-toggle-arrow" aria-hidden="true">▾</span></span></summary><div id="script-summary" role="status"></div><div class="actions"><select id="bulk-speaker" aria-label="일괄 지정할 화자"></select><button data-needs-rows="true" onclick="assignSpeaker()">선택 구간 화자 지정</button></div><p id="script-empty" role="status">아직 자막이 없습니다. 원본에서 추출하거나 위에 문장을 입력해 구간을 추가하세요.</p><div class="tablewrap" id="script-table" tabindex="-1" aria-label="추출된 자막 구간"><table><thead><tr><th class="pick-cell"><label class="pick-label"><input id="pick-all" type="checkbox" aria-label="모든 구간 선택" onchange="document.querySelectorAll('.row-pick').forEach(x=>x.checked=this.checked);syncPickAll()"><span>선택</span></label></th><th>시작 (초)</th><th>종료 (초)</th><th style="width:145px">화자</th><th>읽을 문장 / 번역문</th><th>편집</th></tr></thead><tbody id="rows"></tbody></table></div></details><div class="grid"><div><label for="language">대상 언어</label><select id="language"></select><label for="translator">자동 번역 방식</label><select id="translator"><option value="ollama">로컬 Ollama</option><option value="api">외부 API · 서버 환경 변수 설정 필요</option></select></div><div><label for="translation_model">Ollama 모델 이름</label><input id="translation_model" value="gemma4:latest"><p class="muted">Ollama와 번역 모델은 별도 준비가 필요합니다. 자동 설치하지 않습니다. 직접 번역문을 입력해도 됩니다. API 선택 시 대본이 설정한 제공자에게 전송됩니다.</p><div class="actions"><button class="primary" onclick="translateRows()">대본 번역</button><button onclick="restore()">번역 전 대본 복원</button></div></div></div><div class="generation-heading" id="generation-panel"><div class="step">04 / GENERATE</div><h2>음성 생성</h2><p>검토한 대본과 화자 설정으로 더빙을 만듭니다.</p></div><label><input type="checkbox" id="translate-first" checked> 음성 생성 전에 현재 대본을 대상 언어로 번역</label><p class="muted">기본으로 번역 후 더빙합니다. 이미 번역한 대본을 그대로 읽으려면 해제하세요. 영어 생성 시 한국어가 남아 있으면 중단합니다.</p><label><input type="checkbox" id="timed" checked> 원본 시작 시각 참고 · 음성 길이 보존</label><details class="help-details"><summary>설정 도움말</summary><p class="muted">합성된 대사를 원래 속도와 길이 그대로 보존합니다. 배속 조정·자동 축약·대사 무음 대체를 하지 않습니다. 대사가 길면 다음 구간이 늦어질 수 있어 영상 동기화는 별도로 확인해야 합니다. 효과음 표기는 읽지 않습니다. 체크 해제 시 원본 시간의 빈 간격 없이 대사를 이어 붙입니다.</p></details><div class="actions"><button id="generate-button" class="primary" onclick="generate()">번역 후 음성 생성</button><button onclick="saveScript()">대본 JSON 저장</button><label style="margin:0"><input id="load" type="file" accept="application/json" onchange="loadScript(this)" aria-label="대본 JSON 불러오기"></label></div></section>
+
+
+
+
+
+
+
+
+
+
+
+<div class="grid"><section class="card"><h2>작업 상태</h2><div id="state" role="status" aria-live="polite">준비 중…</div><pre id="logs">환경 정보를 확인하고 있습니다.</pre><div id="error" role="alert"></div></section><section class="card"><h2>생성 결과</h2><p class="muted">대사를 보존한 자연 속도 음성과 실제 발화 시간의 자막을 다운로드하세요.</p><div id="results"></div></section></div><footer>Local-AI-TTS · UI v1.3.1 · 모델 최초 다운로드에는 인터넷 연결이 필요합니다. 생성 파일은 이 PC의 프로젝트 결과 폴더에 보관됩니다. YouTube Studio 업로드는 직접 진행하세요.</footer></main>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+
+
+
+
+const token='__TOKEN__';const $=id=>document.getElementById(id);let backup=null,busy=false,serverReady=false;
+
+
+
+
+
+
+
+
+
+
+
+function stage(message,error=false){$('extract-status').textContent=message;$('extract-status').style.color=error?'#b42318':'#474f5b';$('state').textContent=message}
+
+
+
+
+
+
+
+
+
+
+
+function connectionError(message){const notice=$('connection-notice');notice.hidden=false;notice.textContent=message;stage(message,true);$('error').textContent=message}
+
+
+
+
+
+
+
+
+
+
+
+async function request(path,options={},timeout=60000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeout);try{const response=await fetch(path,{...options,signal:controller.signal});let value;try{value=await response.json()}catch{throw Error('서버 응답을 읽지 못했습니다. http://127.0.0.1:8765에서 다시 접속하세요.')}if(!response.ok)throw Error(value.error||`서버 오류 (${response.status})`);return value}catch(e){if(e.name==='AbortError')throw Error('서버 응답 시간이 초과됐습니다. 실행 창이 켜져 있는지 확인하세요.');if(e instanceof TypeError)throw Error('서버에 연결할 수 없습니다. 2026-10-22-실행.cmd를 실행하고 http://127.0.0.1:8765로 접속하세요.');throw e}finally{clearTimeout(timer)}}
+
+
+
+
+
+
+
+
+
+
+
+async function api(path,data){return request(path,{method:'POST',headers:{'Content-Type':'application/json','X-App-Token':token},body:JSON.stringify(data)})}
+
+
+
+
+
+
+
+
+
+
+
+function fail(e){const message=e.message||String(e);$('error').textContent=message;stage('실패: '+message,true)}
+
+
+
+
+
+
+
+
+
+
+
+let subtitleResizePending=false;
+
+
+
+
+
+
+
+
+
+
+
+function queueSubtitleResize(){if(subtitleResizePending)return;subtitleResizePending=true;requestAnimationFrame(()=>{subtitleResizePending=false;resizeSubtitles()})}
+
+
+
+
+
+
+
+
+
+
+
+function autoSizeSubtitle(el){if(!el.getClientRects().length)return;el.style.height='auto';const style=getComputedStyle(el);const border=parseFloat(style.borderTopWidth)+parseFloat(style.borderBottomWidth);el.style.height=Math.max(44,Math.ceil(el.scrollHeight+border))+'px'}
+
+
+
+
+
+
+
+
+
+
+
+function resizeSubtitles(){document.querySelectorAll('#rows textarea').forEach(autoSizeSubtitle)}
+
+
+
+
+
+
+
+
+
+
+
+function syncPickAll(){const all=$('pick-all'),picks=[...document.querySelectorAll('.row-pick')],count=picks.filter(x=>x.checked).length;all.checked=picks.length>0&&count===picks.length;all.indeterminate=count>0&&count<picks.length;all.disabled=!picks.length}
+
+
+
+
+
+
+
+function syncScriptList(){syncPickAll();const empty=!$('rows').children.length;$('script-empty').hidden=!empty;$('script-table').hidden=empty;$('bulk-speaker').disabled=empty;const count=$('rows').children.length;document.querySelectorAll('[data-needs-rows]').forEach(b=>b.disabled=busy||!serverReady||!count);$('script-count').textContent='자막 '+count+'개';$('script-toggle-label').textContent=$('script-panel').open?'접기':'펼치기';$('script-toggle-arrow').textContent=$('script-panel').open?'▾':'▸';queueSubtitleResize()}
+
+
+
+
+
+
+
+
+
+
+
+function addRow(a,b,t,reveal=true){const tr=document.createElement('tr');for(const [i,v] of [a,b,t].entries()){const td=document.createElement('td'),el=document.createElement(i===2?'textarea':'input');if(i<2){el.type='number';el.step='0.01';el.min='0'}else{el.rows=1;el.addEventListener('keydown',editSubtitleKey);el.addEventListener('input',()=>autoSizeSubtitle(el))}el.value=v;el.setAttribute('aria-label',['시작 초','종료 초','문장'][i]);td.append(el);tr.append(td)}const td=document.createElement('td'),btn=document.createElement('button');btn.textContent='삭제';btn.className='delete-row';btn.onclick=()=>{tr.remove();syncScriptList()};td.append(btn);tr.append(td);const who=document.createElement('td'),pick=document.createElement('input'),select=document.createElement('select');pick.type='checkbox';pick.className='row-pick';pick.setAttribute('aria-label','화자 일괄 지정 구간 선택');pick.style.width='18px';select.className='row-speaker';select.setAttribute('aria-label','대사 화자');who.append(select);tr.insertBefore(who,tr.children[2]);const picked=document.createElement('td');picked.className='pick-cell';picked.append(pick);tr.prepend(picked);pick.addEventListener('change',syncPickAll);$('rows').append(tr);refreshSpeakers();if(reveal)$('script-panel').open=true;syncScriptList()}
+
+
+
+
+
+
+
+
+
+
+
+const editHistory=[];
+function snapshotEdit(){const entries=[...$('rows').children];return {rows:getRows(),ids:rowSpeakers(),selected:entries.map(r=>r.querySelector('.row-pick').checked),sources:entries.map(r=>r.querySelector('details p')?.textContent||null),backup:backup?structuredClone(backup):null}}
+function rememberEdit(){editHistory.push(snapshotEdit());if(editHistory.length>50)editHistory.shift();$('undo-edit').disabled=false}
+function applyEdit(state){setRows(state.rows);setAssignments(state.ids);backup=state.backup;[...$('rows').children].forEach((r,i)=>{r.querySelector('.row-pick').checked=state.selected[i]||false;if(state.sources?.[i]){const d=document.createElement('details'),sum=document.createElement('summary'),p=document.createElement('p');sum.textContent='분리 전 원문 참고';p.textContent=state.sources[i];d.append(sum,p);r.querySelector('textarea').parentElement.append(d)}});syncPickAll()}
+function undoSubtitleEdit(){if(busy||!editHistory.length)return;const state=editHistory.pop();applyEdit(state);$('undo-edit').disabled=!editHistory.length;stage('구간 편집을 되돌렸습니다.')}
+function editSubtitleKey(event){if(event.isComposing||event.keyCode===229||busy)return;const el=event.currentTarget;
+ if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='z'&&editHistory.length){event.preventDefault();undoSubtitleEdit();return}
+ const splitting=event.key==='Enter'&&!event.shiftKey;
+ const merging=event.key==='Backspace'&&el.selectionStart===0&&el.selectionEnd===0;
+ if(!splitting&&!merging)return;
+ event.preventDefault();const row=el.closest('tr'),index=[...$('rows').children].indexOf(row),state=snapshotEdit(),[a,b,text]=state.rows[index];
+ if(!Number.isFinite(a)||!Number.isFinite(b)||b<=a)return stage('시작·종료 시간을 먼저 확인하세요.',true);
+ if(splitting){
+  if(el.selectionStart!==el.selectionEnd)return stage('선택 영역을 해제하고 분리할 위치에 커서를 놓으세요.',true);
+  const left=text.slice(0,el.selectionStart).trim(),right=text.slice(el.selectionEnd).trim();
+  if(!left||!right)return stage('문장 중간에 커서를 놓고 Enter를 누르세요.',true);
+  const split=Math.round((a+(b-a)*Array.from(left).length/(Array.from(left).length+Array.from(right).length))*1000)/1000;
+  if(split<=a||split>=b)return stage('구간이 너무 짧아 분리할 수 없습니다.',true);
+  if(state.rows.length>=1000)return stage('최대 1000개 구간입니다.',true);
+  rememberEdit();state.rows.splice(index,1,[a,split,left],[split,b,right]);state.ids.splice(index,1,state.ids[index],state.ids[index]);state.selected.splice(index,1,state.selected[index],state.selected[index]);state.sources.splice(index,1,state.sources[index],state.sources[index]);state.backup=null;applyEdit(state);
+  const next=$('rows').children[index+1].querySelector('textarea');next.focus();next.setSelectionRange(0,0);stage('구간을 분리했습니다. 경계 시간은 글자 비율 추정값이므로 확인하세요. 번역 전 대본 복원은 되돌리기 후 사용하세요.');
+ }else{
+  if(index===0)return;
+  if(state.ids[index-1]!==state.ids[index])return stage('서로 다른 화자는 먼저 같은 화자로 지정한 후 합쳐 주세요.',true);
+  const prev=state.rows[index-1],offset=prev[2].length;rememberEdit();state.rows.splice(index-1,2,[prev[0],b,prev[2]+' '+text]);state.ids.splice(index,1);state.selected.splice(index,1);state.sources[index-1]=[state.sources[index-1],state.sources[index]].filter(Boolean).join(' / ');state.sources.splice(index,1);state.backup=null;applyEdit(state);const target=$('rows').children[index-1].querySelector('textarea');target.focus();target.setSelectionRange(offset,offset);stage('앞 구간과 합쳤습니다. 시작·종료 시간과 화자를 확인하세요.');
+ }
+}
+function getRows(){return [...$('rows').children].map(tr=>{const v=[...tr.querySelectorAll('input[type=number],textarea')].map(x=>x.value);return [Number(v[0]),Number(v[1]),v[2]]})}
+
+
+
+
+
+
+
+
+
+
+
+function setRows(rows){const ids=rowSpeakers();$('rows').replaceChildren();rows.forEach(r=>addRow(...r,false));setAssignments(ids);syncScriptList()}
+
+
+
+
+
+
+
+
+
+
+
+function showSources(source){[...$('rows').children].forEach((row,i)=>{if(!source[i])return;const details=document.createElement('details'),summary=document.createElement('summary'),text=document.createElement('p');summary.textContent='추출 원문 비교';text.textContent=source[i][2];text.style.whiteSpace='pre-wrap';text.style.fontSize='13px';details.append(summary,text);row.querySelector('textarea').parentElement.append(details)})}
+
+
+
+
+
+
+
+
+
+
+
+function useText(){const t=$('text').value.trim();if(!t)return fail(Error('텍스트를 입력하세요.'));let start=getRows().at(-1)?.[1]||0;t.split(/\n+/).filter(Boolean).forEach(s=>{addRow(start,start+5,s);start+=5})}
+
+
+
+
+
+
+
+
+
+
+
+async function upload(id){const file=$(id).files[0];if(!file)return null;if(file.size>200000000)throw Error('파일은 최대 200MB');const content=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(file)});return (await api('/upload',{name:file.name,content})).id}
+
+
+
+
+
+
+
+
+
+
+
+function disable(v){busy=v;document.querySelectorAll('button').forEach(b=>b.disabled=v||!serverReady||(b.id==='undo-edit'&&!editHistory.length)||(b.dataset.needsRows==='true'&&!$('rows').children.length))}
+
+
+
+
+
+
+
+
+
+
+
+function renderResultFiles(result,id,box,submittedSpeakers=[]){
+ const groups={};const speakers=result.speakers||submittedSpeakers;
+ const names=new Map(speakers.map(p=>[p.id,p.name]));
+ function group(title,description){if(groups[title])return groups[title];const section=document.createElement('section'),h=document.createElement('h3');section.className='result-group';h.textContent=title;section.append(h);if(description){const p=document.createElement('p');p.className='muted';p.textContent=description;section.append(p)}box.append(section);return groups[title]=section}
+ for(const file of result.files){
+  const match=/^2026-10-22-speaker-(.+)\.wav$/.exec(file);const wav=file.endsWith('.wav');
+  let parent,label=file;
+  if(match){parent=group('인물별 음성','전체 더빙과 같은 길이입니다. 해당 인물의 대사가 없는 구간은 무음입니다.');const name=names.get(match[1])||'화자 '+match[1];const track=document.createElement('div'),h=document.createElement('h4');track.className='speaker-result';h.textContent=name;track.append(h);parent.append(track);parent=track;label=name+' · 음성 다운로드'}
+  else if(wav||file.endsWith('.srt')||file.endsWith('.zip')){parent=group('전체 더빙','모든 화자의 대사를 함께 듣거나 전체 파일을 다운로드하세요.');label=wav?'전체 더빙 · WAV':file.endsWith('.srt')?'전체 자막 · SRT':'전체 파일 · ZIP'}
+  else parent=group('검수 자료','시간 배치·대본·번역·음성 검수 기록입니다.');
+  const a=document.createElement('a');a.href='/files/'+encodeURIComponent(id)+'/'+encodeURIComponent(file);a.textContent=label;a.title=file;a.className='download';a.download=match?(names.get(match[1])||'화자-'+match[1])+'-'+file:file;parent.append(a,document.createTextNode(' '));
+  if(wav){const audio=document.createElement('audio');audio.controls=true;audio.preload='none';audio.src=a.href;audio.setAttribute('aria-label',match?(names.get(match[1])||match[1])+' 음성':'전체 더빙 음성');parent.append(audio)}
+ }
+ // Keep the three groups in a predictable order even when file order varies.
+ for(const title of ['전체 더빙','인물별 음성','검수 자료'])if(groups[title])box.append(groups[title]);
+}
+function renderReview(result,box){
+
+
+
+
+
+
+
+
+
+
+
+ const notice=document.createElement('p');notice.style.color='#805700';
+
+
+
+
+
+
+
+
+
+
+
+ notice.textContent=result.sync_required?'배속 변경 없이 합성 음성을 보존했습니다. 일부 대사가 원본 시간을 초과하므로 영상 동기화는 추가 조정이 필요합니다. 최대 시작 이동 '+result.timing.max_shift.toFixed(2)+'초.':'합성된 음성을 배속 변경 없이 그대로 보존했습니다.';
+
+
+
+
+
+
+
+
+
+
+
+ box.append(notice);
+
+
+
+
+
+
+
+
+
+
+
+ if(result.review_required){const review=document.createElement('p');review.textContent='자동 재인식에서 차이가 있는 '+result.review_required+'개 구간은 검수 보고서를 확인하세요. 이 점수로 음성을 교체하거나 삭제하지 않았습니다.';box.append(review)}
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+async function job(action,data){if(busy)return;if(!serverReady){fail(Error('서버 연결이 준비되지 않았습니다. 페이지 상단 안내를 확인하세요.'));return}disable(true);$('error').textContent='';stage(action==='extract'?'자막 / 음성 추출 요청 중…':'작업 요청 중…');try{const {id}=await api('/'+action,data);for(;;){const j=await request('/jobs/'+id,{},10000);const label={queued:'대기 중',running:'처리 중',done:'완료',error:'실패'}[j.state];stage(label+(j.logs?.length?' · '+j.logs.at(-1):''));$('logs').textContent=j.logs.join('\n')||'작업을 시작합니다.';if(j.state==='error')throw Error(j.error);if(j.state==='done'){if(j.result.rows){editHistory.length=0;$('undo-edit').disabled=true;setRows(j.result.rows);}if(j.result.row_speakers)setAssignments(j.result.row_speakers);if(action==='extract')setAssignments([]);if(j.result.source_rows){backup=j.result.source_rows;showSources(j.result.source_rows)}if(action==='translate'){$('translate-first').checked=false;$('generate-button').textContent='현재 대본으로 음성 생성'}if(action==='extract'){backup=null;const count=j.result.rows.length;const message=`추출 완료 · 자막 ${count}개 구간. 아래 표에서 문장을 확인하세요.`;stage(message);$('translate-first').checked=true;$('generate-button').textContent='번역 후 음성 생성';$('script-summary').textContent=message+(j.result.caption_notice?' '+j.result.caption_notice:'');$('script-panel').open=true;resizeSubtitles();$('script-panel').scrollIntoView({behavior:'instant',block:'start'});$('script-table').focus({preventScroll:true})}if(j.result.files){if(action==='translate')stage('문맥 번역 완료 · '+j.result.rows.length+'개 구간 · 원문 비교를 펼쳐 확인하세요.');else stage('원음 보존 생성 · 배속 변경 없음 · 전체 구간 '+j.result.rows.length+'개'+(j.result.sync_required?' · 영상 동기화 확인 필요':'')+(j.result.timing?' · 최대 시작 이동 '+j.result.timing.max_shift.toFixed(2)+'초':''));const box=document.createElement('div');if(action==='translate'){const info=document.createElement('p');info.textContent='번역 완료. 각 문장의 추출 원문 비교를 펼쳐 확인하세요. 원본 시간은 변경하지 않았습니다.';box.append(info)}else renderReview(j.result,box);renderResultFiles(j.result,id,box,data.speakers||[]);$('results').prepend(box)}return}await new Promise(r=>setTimeout(r,1000))}}catch(e){fail(e)}finally{disable(false)}}
+
+
+
+
+
+
+
+
+
+
+
+async function extract(){if(busy)return;try{if(!$('url').value.trim()&&!$('media').files.length)throw Error('YouTube 링크를 입력하거나 영상·음성 파일을 선택하세요.');stage('추출 준비 중…');await job('extract',{url:$('url').value.trim(),media:await upload('media'),source_language:$('source_language').value,whisper:$('whisper').value})}catch(e){fail(e)}}
+
+
+
+
+
+
+
+
+
+
+
+async function translateRows(){backup=getRows();await job('translate',{rows:backup,...speakerData(),language:$('language').value,translator:$('translator').value,translation_model:$('translation_model').value})}
+
+
+
+
+
+
+
+
+
+
+
+function restore(){if(backup){setRows(backup);$('translate-first').checked=true;$('generate-button').textContent='번역 후 음성 생성'}}
+
+
+
+
+
+
+
+
+
+
+
+async function generate(){if(busy)return;try{if(($('voice').files.length||[...$('speakers').querySelectorAll('input[type=file]')].some(x=>x.files.length)||speakerProfiles.some(p=>p.voice))&&!$('consent').checked)throw Error('목소리 사용 권한을 확인하세요.');const cast=await uploadSpeakers();await job('generate',{rows:getRows(),...cast,language:$('language').value,voice:await upload('voice'),consent:$('consent').checked,emotion:Number($('emotion').value),cfg:Number($('cfg').value),timed:$('timed').checked,translate_first:$('translate-first').checked,translator:$('translator').value,translation_model:$('translation_model').value})}catch(e){fail(e)}}
+
+
+
+
+
+
+
+
+
+
+
+function saveScript(){const u=URL.createObjectURL(new Blob([JSON.stringify({version:'1.1.0',rows:getRows(),...speakerData(),language:$('language').value},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='2026-10-22-script.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),5000)}
+
+
+
+
+
+
+
+
+
+
+
+async function loadScript(input){try{const data=JSON.parse(await input.files[0].text()),rows=Array.isArray(data)?data:data.rows;if(!Array.isArray(rows)||!rows.every(r=>Array.isArray(r)&&r.length===3))throw Error('대본 JSON 형식 오류');const profiles=Array.isArray(data)?[]:data.speakers||[];if(profiles.length>20||profiles.some(p=>typeof p.id!=='string'||!/^[a-zA-Z0-9_-]{1,40}$/.test(p.id)||typeof p.name!=='string'||!p.name.trim())||new Set(profiles.map(p=>p.id)).size!==profiles.length)throw Error('화자 설정 오류');speakerProfiles=[];$('speakers').replaceChildren();profiles.forEach(p=>addSpeaker(p));editHistory.length=0;$('undo-edit').disabled=true;backup=null;setRows(rows);setAssignments(data.row_speakers||[]);if(data.language)$('language').value=data.language;stage('대본 불러오기 완료 · 참조 음성은 필요시 다시 선택하세요.')}catch(e){fail(e)}}
+
+
+
+
+
+
+
+
+
+
+
+let speakerProfiles=[];
+
+
+
+
+
+
+
+
+
+
+
+function rowSpeakers(){return [...document.querySelectorAll('.row-speaker')].map(x=>x.value)}
+
+
+
+
+
+
+
+
+
+
+
+function setAssignments(ids){document.querySelectorAll('.row-speaker').forEach((x,i)=>x.value=[...x.options].some(o=>o.value===ids[i])?ids[i]:(speakerProfiles[0]?.id||'default'))}
+
+
+
+
+
+
+
+
+
+
+
+function speakerData(){return {speakers:speakerProfiles.map(p=>({id:p.id,name:$(p.id+'-name').value.trim()||p.name,voice:p.voice||null})),row_speakers:rowSpeakers()}}
+
+
+
+
+
+
+
+
+
+
+
+function refreshSpeakers(){for(const select of [...document.querySelectorAll('.row-speaker'),$('bulk-speaker')]){const previous=select.value;select.replaceChildren();const profiles=speakerProfiles.length?speakerProfiles:[{id:'default',name:'기본 목소리'}];profiles.forEach(p=>select.add(new Option($(p.id+'-name')?.value||p.name,p.id)));if(profiles.some(p=>p.id===previous))select.value=previous}}
+
+
+
+
+
+
+
+
+
+
+
+function addSpeaker(saved){if(speakerProfiles.length>=20)return fail(Error('인물은 최대 20명입니다.'));const p={id:saved?.id||'s'+crypto.randomUUID().replaceAll('-',''),name:saved?.name||'인물 '+(speakerProfiles.length+1),voice:saved?.voice||null};speakerProfiles.push(p);const box=document.createElement('div'),name=document.createElement('input'),file=document.createElement('input'),remove=document.createElement('button'),label=document.createElement('label');box.className='speaker-card';name.id=p.id+'-name';name.value=p.name;name.maxLength=80;name.setAttribute('aria-label','인물 이름');name.oninput=refreshSpeakers;file.id=p.id+'-file';file.type='file';file.accept='audio/*,video/*';file.setAttribute('aria-label',p.name+' 참조 음성');file.onchange=()=>p.voice=null;label.htmlFor=file.id;label.textContent='참조 음성 · 권장 10~30초';remove.textContent='인물 제거';remove.onclick=()=>{if(rowSpeakers().includes(p.id))return fail(Error('이 인물의 자막을 다른 화자로 지정한 후 제거하세요.'));speakerProfiles=speakerProfiles.filter(x=>x!==p);box.remove();refreshSpeakers()};box.append(name,label,file,remove);$('speakers').append(box);refreshSpeakers()}
+
+
+
+
+
+
+
+
+
+
+
+function assignSpeaker(){document.querySelectorAll('#rows tr').forEach(tr=>{if(tr.querySelector('.row-pick').checked)tr.querySelector('.row-speaker').value=$('bulk-speaker').value})}
+
+
+
+
+
+
+
+
+
+
+
+async function uploadSpeakers(){for(const p of speakerProfiles){if($(p.id+'-file').files.length)p.voice=await upload(p.id+'-file')}return speakerData()}
+
+
+
+
+
+
+
+
+
+
+
+async function initialize(){disable(true);if(location.protocol==='file:'){connectionError('HTML 파일을 직접 열면 추출할 수 없습니다. 2026-10-22-실행.cmd를 실행한 뒤 http://127.0.0.1:8765로 접속하세요.');return}try{const s=await request('/status',{},8000);for(const id of ['language','source_language'])for(const [code,name]of Object.entries(s.languages)){$(id).add(new Option(name,code))}$('language').value='en';$('source_language').value='ko';const missing=Object.entries(s.modules).filter(([k,v])=>!v).map(([k])=>k);serverReady=true;stage(missing.length?'서버 연결됨 · 엔진 설치 필요: '+missing.join(', '):'준비 완료 · 링크 입력 후 추출을 누르세요.');$('logs').textContent='Python: '+s.python+'\n'+(missing.length?'미설치: '+missing.join(', '):'엔진 패키지 확인 완료');disable(false)}catch(e){connectionError(e.message)}}
+
+
+
+
+
+
+
+
+
+
+
+$('translate-first').addEventListener('change',()=>{$('generate-button').textContent=$('translate-first').checked?'번역 후 음성 생성':'현재 대본으로 음성 생성'});
+
+
+
+
+
+
+
+
+
+
+
+$('script-panel').addEventListener('toggle',syncScriptList);
+
+
+
+
+
+
+
+
+
+
+
+if(typeof ResizeObserver!=='undefined'){let scriptWidth=0;new ResizeObserver(entries=>{const width=entries[0].contentRect.width;if(Math.abs(width-scriptWidth)>.5){scriptWidth=width;queueSubtitleResize()}}).observe($('script-table'))}
+
+
+
+
+
+
+
+
+
+
+
+refreshSpeakers();syncScriptList();initialize();
+
+
+
+
+
+
+
+
+
+
+
+</script></html>
