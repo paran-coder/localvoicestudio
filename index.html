@@ -517,7 +517,9 @@ main>.grid{align-items:stretch}
 
 /* WEB v1.1.0: named tracks and result hierarchy. */
 .result-group{padding:20px 0;border-top:1px solid #d5d9df;margin-top:16px;min-width:0}.result-group h3{font-size:16px;line-height:1.4;margin:0 0 8px;font-weight:600}.result-group h4{font-size:14px;margin:0 0 10px;font-weight:600}.result-group p{margin:0 0 12px}.speaker-result{padding:16px;background:#f7f8fa;border:1px solid #e3e5e8;border-radius:8px;margin:12px 0}.result-group audio{margin:12px 0 0}.result-group .download{white-space:normal;overflow-wrap:anywhere}
-</style><main><header><div><div class="step">LOCAL VOICE STUDIO</div><h1>다국어 더빙 스튜디오</h1><p style="margin-bottom:0">원본을 가져오고, 대사를 다듬어 원하는 목소리로 더빙하세요.</p></div><span class="tag">WEB v1.1.0 · LOCAL</span></header><section class="card" id="engine-panel" style="margin:20px 0"><div class="row"><div><h2>로컬 엔진 연결</h2><p id="engine-state" role="status">연결 전 · 엔진이 실행 중인지 확인하세요.</p></div><div><label for="pair-code">트레이에서 확인한 연결 코드 (8자리)</label><input id="pair-code" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="연결 코드를 입력하세요"><div class="actions"><button id="engine-connect" class="primary" onclick="connectEngine()">로컬 엔진 연결 확인</button><a class="download" href="./manual.html" target="_blank" rel="noopener">사용자 매뉴얼</a></div></div></div><div id="engine-help" hidden><p>연결되지 않으면 미설치·엔진 중지·브라우저 권한을 확인하세요. 설치 후 2026-10-22-engine-start.vbs를 실행하고 트레이의 ‘웹 연결 코드’를 입력하세요. 웹 페이지를 새로고침하거나 엔진을 재시작하면 다시 연결해야 합니다.</p><a class="download" href="./downloads/2026-10-22-Local-AI-TTS-Windows-v1.1.0.zip" download>Windows 로컬 엔진 다운로드</a><a class="download" href="./manual.html#install">설치·연결 방법</a></div></section><nav class="workflow" aria-label="더빙 작업 순서"><a href="#source-panel"><b>01</b> 원본 가져오기</a><a href="#voice-panel"><b>02</b> 목소리 설정</a><a href="#editor-panel"><b>03</b> 대본·번역</a><a href="#generation-panel"><b>04</b> 음성 생성</a></nav><div id="connection-notice" role="alert" hidden style="margin:18px 0;padding:16px;background:#fff1f0;border:1px solid #d92d20;border-radius:10px"></div>
+/* Manual-owned connection flow v1.1.1 */
+.header-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}.header-tools button{font-size:13px;white-space:nowrap}.header-tools .connected{background:#fffbea;border-color:#b28a00;color:#594400}@media(max-width:760px){header{flex-wrap:wrap}.header-tools{justify-content:flex-start}}
+</style><main><header><div><div class="step">LOCAL VOICE STUDIO</div><h1>다국어 더빙 스튜디오</h1><p style="margin-bottom:0">원본을 가져오고, 대사를 다듬어 원하는 목소리로 더빙하세요.</p></div><div class="header-tools"><button id="engine-connect" onclick="openEngineManual()">로컬 엔진 연결</button><span class="tag">WEB v1.1.1 · LOCAL</span></div></header><nav class="workflow" aria-label="더빙 작업 순서"><a href="#source-panel"><b>01</b> 원본 가져오기</a><a href="#voice-panel"><b>02</b> 목소리 설정</a><a href="#editor-panel"><b>03</b> 대본·번역</a><a href="#generation-panel"><b>04</b> 음성 생성</a></nav><div id="connection-notice" role="alert" hidden style="margin:18px 0;padding:16px;background:#fff1f0;border:1px solid #d92d20;border-radius:10px"></div>
 
 
 
@@ -565,7 +567,7 @@ main>.grid{align-items:stretch}
 
 
 
-<div class="grid"><section class="card"><h2>작업 상태</h2><div id="state" role="status" aria-live="polite">준비 중…</div><pre id="logs">환경 정보를 확인하고 있습니다.</pre><div id="error" role="alert"></div></section><section class="card"><h2>생성 결과</h2><p class="muted">대사를 보존한 자연 속도 음성과 실제 발화 시간의 자막을 다운로드하세요.</p><div id="results"></div></section></div><footer>Local-AI-TTS · WEB v1.1.0 · 모델 최초 다운로드에는 인터넷 연결이 필요합니다. 생성 파일은 이 PC의 프로젝트 결과 폴더에 보관됩니다. YouTube Studio 업로드는 직접 진행하세요.</footer></main>
+<div class="grid"><section class="card"><h2>작업 상태</h2><div id="state" role="status" aria-live="polite">준비 중…</div><pre id="logs">환경 정보를 확인하고 있습니다.</pre><div id="error" role="alert"></div></section><section class="card"><h2>생성 결과</h2><p class="muted">대사를 보존한 자연 속도 음성과 실제 발화 시간의 자막을 다운로드하세요.</p><div id="results"></div></section></div><footer>Local-AI-TTS · WEB v1.1.1 · 모델 최초 다운로드에는 인터넷 연결이 필요합니다. 생성 파일은 이 PC의 프로젝트 결과 폴더에 보관됩니다. YouTube Studio 업로드는 직접 진행하세요.</footer></main>
 
 
 
@@ -625,7 +627,7 @@ function connectionError(message){const notice=$('connection-notice');notice.hid
 
 
 
-async function request(path,options={},timeout=60000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeout);try{const response=await fetch(engineBase+path,{...options,headers:{'X-App-Token':token,...(options.headers||{})},targetAddressSpace:'loopback',signal:controller.signal});let value;try{value=await response.json()}catch{throw Error('서버 응답을 읽지 못했습니다. http://127.0.0.1:8766에서 다시 접속하세요.')}if(!response.ok)throw Error(value.error||`서버 오류 (${response.status})`);return value}catch(e){if(e.name==='AbortError')throw Error('서버 응답 시간이 초과됐습니다. 실행 창이 켜져 있는지 확인하세요.');if(e instanceof TypeError)throw Error('서버에 연결할 수 없습니다. 2026-10-22-engine-start.vbs를 실행하고 http://127.0.0.1:8766로 접속하세요.');throw e}finally{clearTimeout(timer)}}
+async function request(path,options={},timeout=60000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeout);try{const response=await fetch(engineBase+path,{...options,headers:{'X-App-Token':token,...(options.headers||{})},targetAddressSpace:'loopback',signal:controller.signal});let value;try{value=await response.json()}catch{throw Error('서버 응답을 읽지 못했습니다. http://127.0.0.1:8766에서 다시 접속하세요.')}if(response.status===401){serverReady=false;token='';$('engine-connect').textContent='로컬 엔진 연결';$('engine-connect').classList.remove('connected')}if(!response.ok)throw Error(value.error||`서버 오류 (${response.status})`);return value}catch(e){if(e.name==='AbortError')throw Error('서버 응답 시간이 초과됐습니다. 실행 창이 켜져 있는지 확인하세요.');if(e instanceof TypeError){serverReady=false;token='';$('engine-connect').textContent='로컬 엔진 연결';throw Error('로컬 엔진 연결이 끊겼습니다. 상단 버튼에서 다시 연결하세요.');}throw e}finally{clearTimeout(timer)}}
 
 
 
@@ -717,7 +719,7 @@ function syncPickAll(){const all=$('pick-all'),picks=[...document.querySelectorA
 
 
 
-function syncScriptList(){syncPickAll();const empty=!$('rows').children.length;$('script-empty').hidden=!empty;$('script-table').hidden=empty;$('bulk-speaker').disabled=empty;const count=$('rows').children.length;document.querySelectorAll('[data-needs-rows]').forEach(b=>b.disabled=busy||!serverReady||!count);$('script-count').textContent='자막 '+count+'개';$('script-toggle-label').textContent=$('script-panel').open?'접기':'펼치기';$('script-toggle-arrow').textContent=$('script-panel').open?'▾':'▸';queueSubtitleResize()}
+function syncScriptList(){syncPickAll();const empty=!$('rows').children.length;$('script-empty').hidden=!empty;$('script-table').hidden=empty;$('bulk-speaker').disabled=empty;const count=$('rows').children.length;document.querySelectorAll('[data-needs-rows]').forEach(b=>b.disabled=busy||!count);$('script-count').textContent='자막 '+count+'개';$('script-toggle-label').textContent=$('script-panel').open?'접기':'펼치기';$('script-toggle-arrow').textContent=$('script-panel').open?'▾':'▸';queueSubtitleResize()}
 
 
 
@@ -828,7 +830,7 @@ async function upload(id){const file=$(id).files[0];if(!file)return null;if(file
 
 
 
-function disable(v){busy=v;document.querySelectorAll('button').forEach(b=>b.disabled=b.id==='engine-connect'?false:v||!serverReady||(b.id==='undo-edit'&&!editHistory.length)||(b.dataset.needsRows==='true'&&!$('rows').children.length))}
+function disable(v){busy=v;document.querySelectorAll('button').forEach(b=>b.disabled=b.id==='engine-connect'?false:v||(b.id==='undo-edit'&&!editHistory.length)||(b.dataset.needsRows==='true'&&!$('rows').children.length))}
 
 
 
@@ -928,7 +930,7 @@ function renderReview(result,box){
 
 
 
-async function job(action,data){if(busy)return;if(!serverReady){fail(Error('서버 연결이 준비되지 않았습니다. 페이지 상단 안내를 확인하세요.'));return}disable(true);$('error').textContent='';stage(action==='extract'?'자막 / 음성 추출 요청 중…':'작업 요청 중…');try{const {id}=await api('/'+action,data);for(;;){const j=await request('/jobs/'+id,{},10000);const label={queued:'대기 중',running:'처리 중',done:'완료',error:'실패'}[j.state];stage(label+(j.logs?.length?' · '+j.logs.at(-1):''));$('logs').textContent=j.logs.join('\n')||'작업을 시작합니다.';if(j.state==='error')throw Error(j.error);if(j.state==='done'){if(j.result.rows){editHistory.length=0;$('undo-edit').disabled=true;setRows(j.result.rows);}if(j.result.row_speakers)setAssignments(j.result.row_speakers);if(action==='extract')setAssignments([]);if(j.result.source_rows){backup=j.result.source_rows;showSources(j.result.source_rows)}if(action==='translate'){$('translate-first').checked=false;$('generate-button').textContent='현재 대본으로 음성 생성'}if(action==='extract'){backup=null;const count=j.result.rows.length;const message=`추출 완료 · 자막 ${count}개 구간. 아래 표에서 문장을 확인하세요.`;stage(message);$('translate-first').checked=true;$('generate-button').textContent='번역 후 음성 생성';$('script-summary').textContent=message+(j.result.caption_notice?' '+j.result.caption_notice:'');$('script-panel').open=true;resizeSubtitles();$('script-panel').scrollIntoView({behavior:'instant',block:'start'});$('script-table').focus({preventScroll:true})}if(j.result.files){if(action==='translate')stage('문맥 번역 완료 · '+j.result.rows.length+'개 구간 · 원문 비교를 펼쳐 확인하세요.');else stage('원음 보존 생성 · 배속 변경 없음 · 전체 구간 '+j.result.rows.length+'개'+(j.result.sync_required?' · 영상 동기화 확인 필요':'')+(j.result.timing?' · 최대 시작 이동 '+j.result.timing.max_shift.toFixed(2)+'초':''));const box=document.createElement('div');if(action==='translate'){const info=document.createElement('p');info.textContent='번역 완료. 각 문장의 추출 원문 비교를 펼쳐 확인하세요. 원본 시간은 변경하지 않았습니다.';box.append(info)}else renderReview(j.result,box);renderResultFiles(j.result,id,box,data.speakers||[]);$('results').prepend(box)}return}await new Promise(r=>setTimeout(r,1000))}}catch(e){fail(e)}finally{disable(false)}}
+async function job(action,data){if(busy)return;if(!requireEngine())return;disable(true);$('error').textContent='';stage(action==='extract'?'자막 / 음성 추출 요청 중…':'작업 요청 중…');try{const {id}=await api('/'+action,data);for(;;){const j=await request('/jobs/'+id,{},10000);const label={queued:'대기 중',running:'처리 중',done:'완료',error:'실패'}[j.state];stage(label+(j.logs?.length?' · '+j.logs.at(-1):''));$('logs').textContent=j.logs.join('\n')||'작업을 시작합니다.';if(j.state==='error')throw Error(j.error);if(j.state==='done'){if(j.result.rows){editHistory.length=0;$('undo-edit').disabled=true;setRows(j.result.rows);}if(j.result.row_speakers)setAssignments(j.result.row_speakers);if(action==='extract')setAssignments([]);if(j.result.source_rows){backup=j.result.source_rows;showSources(j.result.source_rows)}if(action==='translate'){$('translate-first').checked=false;$('generate-button').textContent='현재 대본으로 음성 생성'}if(action==='extract'){backup=null;const count=j.result.rows.length;const message=`추출 완료 · 자막 ${count}개 구간. 아래 표에서 문장을 확인하세요.`;stage(message);$('translate-first').checked=true;$('generate-button').textContent='번역 후 음성 생성';$('script-summary').textContent=message+(j.result.caption_notice?' '+j.result.caption_notice:'');$('script-panel').open=true;resizeSubtitles();$('script-panel').scrollIntoView({behavior:'instant',block:'start'});$('script-table').focus({preventScroll:true})}if(j.result.files){if(action==='translate')stage('문맥 번역 완료 · '+j.result.rows.length+'개 구간 · 원문 비교를 펼쳐 확인하세요.');else stage('원음 보존 생성 · 배속 변경 없음 · 전체 구간 '+j.result.rows.length+'개'+(j.result.sync_required?' · 영상 동기화 확인 필요':'')+(j.result.timing?' · 최대 시작 이동 '+j.result.timing.max_shift.toFixed(2)+'초':''));const box=document.createElement('div');if(action==='translate'){const info=document.createElement('p');info.textContent='번역 완료. 각 문장의 추출 원문 비교를 펼쳐 확인하세요. 원본 시간은 변경하지 않았습니다.';box.append(info)}else renderReview(j.result,box);renderResultFiles(j.result,id,box,data.speakers||[]);$('results').prepend(box)}return}await new Promise(r=>setTimeout(r,1000))}}catch(e){fail(e);if(!serverReady)openEngineManual(true)}finally{disable(false)}}
 
 
 
@@ -940,7 +942,7 @@ async function job(action,data){if(busy)return;if(!serverReady){fail(Error('서�
 
 
 
-async function extract(){if(busy)return;try{if(!$('url').value.trim()&&!$('media').files.length)throw Error('YouTube 링크를 입력하거나 영상·음성 파일을 선택하세요.');stage('추출 준비 중…');await job('extract',{url:$('url').value.trim(),media:await upload('media'),source_language:$('source_language').value,whisper:$('whisper').value})}catch(e){fail(e)}}
+async function extract(){if(!requireEngine()||busy)return;try{if(!$('url').value.trim()&&!$('media').files.length)throw Error('YouTube 링크를 입력하거나 영상·음성 파일을 선택하세요.');stage('추출 준비 중…');await job('extract',{url:$('url').value.trim(),media:await upload('media'),source_language:$('source_language').value,whisper:$('whisper').value})}catch(e){fail(e)}}
 
 
 
@@ -952,7 +954,7 @@ async function extract(){if(busy)return;try{if(!$('url').value.trim()&&!$('media
 
 
 
-async function translateRows(){backup=getRows();await job('translate',{rows:backup,...speakerData(),language:$('language').value,translator:$('translator').value,translation_model:$('translation_model').value})}
+async function translateRows(){if(!requireEngine())return;backup=getRows();await job('translate',{rows:backup,...speakerData(),language:$('language').value,translator:$('translator').value,translation_model:$('translation_model').value})}
 
 
 
@@ -976,7 +978,7 @@ function restore(){if(backup){setRows(backup);$('translate-first').checked=true;
 
 
 
-async function generate(){if(busy)return;try{if(($('voice').files.length||[...$('speakers').querySelectorAll('input[type=file]')].some(x=>x.files.length)||speakerProfiles.some(p=>p.voice))&&!$('consent').checked)throw Error('목소리 사용 권한을 확인하세요.');const cast=await uploadSpeakers();await job('generate',{rows:getRows(),...cast,language:$('language').value,voice:await upload('voice'),consent:$('consent').checked,emotion:Number($('emotion').value),cfg:Number($('cfg').value),timed:$('timed').checked,translate_first:$('translate-first').checked,translator:$('translator').value,translation_model:$('translation_model').value})}catch(e){fail(e)}}
+async function generate(){if(!requireEngine()||busy)return;try{if(($('voice').files.length||[...$('speakers').querySelectorAll('input[type=file]')].some(x=>x.files.length)||speakerProfiles.some(p=>p.voice))&&!$('consent').checked)throw Error('목소리 사용 권한을 확인하세요.');const cast=await uploadSpeakers();await job('generate',{rows:getRows(),...cast,language:$('language').value,voice:await upload('voice'),consent:$('consent').checked,emotion:Number($('emotion').value),cfg:Number($('cfg').value),timed:$('timed').checked,translate_first:$('translate-first').checked,translator:$('translator').value,translation_model:$('translation_model').value})}catch(e){fail(e)}}
 
 
 
@@ -1108,15 +1110,19 @@ async function uploadSpeakers(){for(const p of speakerProfiles){if($(p.id+'-file
 
 
 
-async function connectEngine(){
- const button=$('engine-connect');button.disabled=true;button.textContent='연결 확인 중…';$('engine-help').hidden=true;
- try{const health=await request('/health',{},5000);if(health.service!=='local-voice-bridge'||health.protocol!==1)throw Error('지원되는 로컬 엔진이 아닙니다.');
- const code=$('pair-code').value.trim();if(!/^\d{8}$/.test(code))throw Error('엔진이 실행 중입니다. 트레이의 ‘웹 연결 코드’ 8자리를 입력하세요.');
- const pair=await request('/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})},10000);token=pair.token;await initialize();if(!serverReady)throw Error('엔진 상태 확인에 실패했습니다.');$('pair-code').value='';$('engine-state').textContent='연결 완료 · 이 웹 화면에서 편집·더빙할 수 있습니다.';$('connection-notice').hidden=true;$('error').textContent='';
- }catch(error){token='';serverReady=false;disable(true);busy=false;$('engine-state').textContent='연결 확인 필요 · '+error.message;$('engine-help').hidden=false;stage('로컬 엔진을 연결한 뒤 작업하세요.');}
- finally{button.disabled=false;button.textContent='로컬 엔진 연결 확인'}
+let engineManual=null;
+function openEngineManual(required=false){
+ if(required){const message='이 작업을 하려면 내 PC의 로컬 엔진을 연결해 주세요. 매뉴얼에서 설치·실행·연결을 진행하세요.';connectionError(message)}
+ engineManual=window.open('./manual.html#connect','voice-engine-manual');
+ if(!engineManual)connectionError('브라우저에서 매뉴얼 창을 허용한 후 상단의 로컬 엔진 연결 버튼을 눌러 주세요.');
 }
-async function initialize(){disable(true);if(location.protocol==='file:'){connectionError('HTML 파일을 직접 열면 추출할 수 없습니다. 2026-10-22-engine-start.vbs를 실행한 뒤 http://127.0.0.1:8766로 접속하세요.');return}try{const s=await request('/status',{},8000);for(const id of ['language','source_language'])$(id).replaceChildren();for(const id of ['language','source_language'])for(const [code,name]of Object.entries(s.languages)){$(id).add(new Option(name,code))}$('language').value='en';$('source_language').value='ko';const missing=Object.entries(s.modules).filter(([k,v])=>!v).map(([k])=>k);serverReady=true;stage(missing.length?'서버 연결됨 · 엔진 설치 필요: '+missing.join(', '):'준비 완료 · 링크 입력 후 추출을 누르세요.');$('logs').textContent='Python: '+s.python+'\n'+(missing.length?'미설치: '+missing.join(', '):'엔진 패키지 확인 완료');disable(false)}catch(e){connectionError(e.message)}}
+function requireEngine(){if(serverReady)return true;openEngineManual(true);return false}
+window.addEventListener('message',async event=>{
+ if(event.origin!==location.origin||event.source!==engineManual||event.data?.type!=='VOICE_ENGINE_CONNECTED'||typeof event.data.token!=='string')return;
+ token=event.data.token;await initialize();
+ if(serverReady){$('engine-connect').textContent='엔진 연결됨';$('engine-connect').classList.add('connected');$('connection-notice').hidden=true;$('error').textContent='';}
+});
+async function initialize(){disable(true);if(location.protocol==='file:'){connectionError('HTML 파일을 직접 열면 추출할 수 없습니다. 2026-10-22-engine-start.vbs를 실행한 뒤 http://127.0.0.1:8766로 접속하세요.');return}try{const source=$('source_language').value||'ko',target=$('language').value||'en';const s=await request('/status',{},8000);for(const id of ['language','source_language'])$(id).replaceChildren();for(const id of ['language','source_language'])for(const [code,name]of Object.entries(s.languages)){$(id).add(new Option(name,code))}$('language').value=target;$('source_language').value=source;const missing=Object.entries(s.modules).filter(([k,v])=>!v).map(([k])=>k);serverReady=true;stage(missing.length?'서버 연결됨 · 엔진 설치 필요: '+missing.join(', '):'준비 완료 · 링크 입력 후 추출을 누르세요.');$('logs').textContent='Python: '+s.python+'\n'+(missing.length?'미설치: '+missing.join(', '):'엔진 패키지 확인 완료');disable(false)}catch(e){connectionError(e.message)}}
 
 
 
@@ -1164,7 +1170,7 @@ if(typeof ResizeObserver!=='undefined'){let scriptWidth=0;new ResizeObserver(ent
 
 
 
-refreshSpeakers();syncScriptList();disable(true);busy=false;stage('로컬 엔진 연결 확인을 눌러 시작하세요.');
+for(const id of ['language','source_language'])for(const [code,name] of Object.entries({"ko": "한국어", "en": "영어", "es": "스페인어", "de": "독일어", "ja": "일본어", "fr": "프랑스어", "zh": "중국어", "ar": "아랍어", "da": "덴마크어", "el": "그리스어", "fi": "핀란드어", "he": "히브리어", "hi": "힌디어", "it": "이탈리아어", "ms": "말레이어", "nl": "네덜란드어", "no": "노르웨이어", "pl": "폴란드어", "pt": "포르투갈어", "ru": "러시아어", "sv": "스웨덴어", "sw": "스와힐리어", "tr": "튀르키예어"}))$(id).add(new Option(name,code));$('language').value='en';$('source_language').value='ko';refreshSpeakers();syncScriptList();disable(false);stage('대본을 편집하거나 원본을 가져오세요. 엔진 연결은 오른쪽 위에서 진행할 수 있습니다.');
 
 
 
