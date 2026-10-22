@@ -38,7 +38,8 @@ if(Test-Path -LiteralPath (Join-Path $oldCache 'torch')){$torch=Join-Path $oldCa
 $plan=[ordered]@{python=$python;base_python=$base;runtime_action=$(if($python){'reuse compatible existing environment (no package changes)'}elseif($base){'reuse Python 3.11; isolated venv inherits packages; install only incompatible/missing pins'}else{'download Python 3.11; isolated runtime'});ffmpeg=$ffmpeg;ffmpeg_action=$(if($ffmpeg){'reuse'}else{'install app-local FFmpeg'});ollama_binary=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_model_present=$hasModel;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
 $plan|ConvertTo-Json -Depth 5|Write-Output
 if($CheckOnly){return}
-& (Join-Path $PSScriptRoot '2026-10-22-register.ps1') -CheckOnly
+& (Join-Path $PSScriptRoot '2026-10-22-register.ps1') -CheckOnly -Repair
+Write-Host ('Setup may update local configuration at: '+(Join-Path $PSScriptRoot '2026-10-22-environment.json')+'. Existing configuration will be backed up. Website registration changes require confirmation.')
 if((Read-Host 'Reuse items shown above; install ONLY missing items? Type YES') -cne 'YES'){return}
 New-Item -ItemType Directory -Force -Path $cache,$tools,(Join-Path $cache 'temp')|Out-Null
 $env:TEMP=Join-Path $cache 'temp';$env:TMP=$env:TEMP
@@ -74,10 +75,11 @@ if(!$external){
  $service=Start-Process -FilePath $ollamaExe -ArgumentList 'serve' -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $env:TEMP 'ollama-install-output.log') -RedirectStandardError (Join-Path $env:TEMP 'ollama-install-error.log')
  try{$ready=$false;for($i=0;$i -lt 30;$i++){try{$tags=Invoke-RestMethod "$ollamaUrl/api/tags" -TimeoutSec 2;$ready=$true;break}catch{Start-Sleep -Seconds 1}};if(!$ready){throw 'Ollama did not start'};if(!(@($tags.models.name) -contains 'gemma4:latest')){RunChecked $ollamaExe @('pull','gemma4:latest')}}finally{if($service -and !$service.HasExited){Stop-Process -Id $service.Id}}
 }
-$config=[ordered]@{version='on-demand-v1.3.0';python=$python;ffmpeg=$ffmpeg;ollama_exe=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
+$config=[ordered]@{version='on-demand-v1.3.1';python=$python;ffmpeg=$ffmpeg;ollama_exe=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
+if(Test-Path -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-environment.json')){Copy-Item -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-environment.json') -Destination (Join-Path $cache ('2026-10-22-environment-backup-'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss-fff')+'.json'))}
+Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'pending-v1.3.1' -Encoding Ascii
 $config|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-environment.json') -Encoding UTF8
-Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'on-demand-v1.3.0' -Encoding Ascii
-Write-Host 'Ready. Existing environments were not overwritten.'
-
-& (Join-Path $PSScriptRoot '2026-10-22-register.ps1')
-Write-Host 'Setup complete. Return to the website and click Studio Start. No background engine was started.'
+& (Join-Path $PSScriptRoot '2026-10-22-register.ps1') -Repair
+& (Join-Path $PSScriptRoot '2026-10-22-verify-setup.ps1')
+Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'on-demand-v1.3.1' -Encoding Ascii
+Write-Host 'Local setup checks passed. Final browser connection is still pending: return to Studio Start. No resident engine was left running.'

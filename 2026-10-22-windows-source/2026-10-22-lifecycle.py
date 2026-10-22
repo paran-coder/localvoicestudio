@@ -16,12 +16,12 @@ class Leases:
    return not active and not self.tabs and now-self.started>=self.ttl
 
 ticket_lock=threading.Lock()
-def consume_ticket(directory,nonce,origin):
+def consume_ticket(directory,nonce,origin,details=False):
  if not isinstance(nonce,str) or not re.fullmatch('[0-9a-f]{64}',nonce):return False
  with ticket_lock:
   p=Path(directory)/(nonce+'.json')
   try:
    data=json.loads(p.read_text(encoding='utf-8-sig'))
    if data.get('origin')!=origin or not 0<=time.time()-data['created']<=120:return False
-   p.unlink();return True
+   p.unlink();return data if details else True
   except (OSError,ValueError,KeyError,TypeError):return False
