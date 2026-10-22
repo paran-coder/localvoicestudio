@@ -28,15 +28,15 @@ async function startStudio(required=false){
  if(location.protocol==='file:'){showStartHelp('이 파일을 직접 열어서는 엔진에 연결할 수 없습니다. 배포된 웹 주소에서 스튜디오 시작을 눌러주세요.');return}
  const attempt=++startAttempt;
  const nonce=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');
- let pendingToken='',launched=false;
+ let pendingToken='',launched=false,launchTime=0;
  const current=()=>attempt===startAttempt;
  const progress=message=>{if(current())connectionPanel(message,false,true)};
  const compatible=h=>h.service==='local-voice-bridge'&&h.protocol===2;
  function launch(force=false){
   if(!current()||(launched&&!force))return;
-  launched=true;
+  launched=true;launchTime=Date.now();
   const a=document.createElement('a');a.href='localvoicestudio://start?origin='+encodeURIComponent(location.origin)+'&nonce='+nonce;a.hidden=true;document.body.append(a);a.click();a.remove();
-  progress('엔진 실행·연결을 요청했습니다. 앱 실행 확인 창이 나타나면 열기를 선택하세요. 이미 설치했다면 다시 설치할 필요는 없습니다.');
+  progress('엔진을 준비하고 있습니다. 앱 열기와 사이트 승인 창이 나타나면 승인하세요. 첫 실행에는 시간이 걸릴 수 있으며, 준비되면 자동으로 연결합니다.');
  }
  function manualLaunch(){
   const b=document.createElement('button');b.type='button';b.textContent='엔진 실행 허용';b.onclick=()=>launch(true);b.className='engine-launch-action';$('connection-notice').querySelector('.connection-actions').append(b);
@@ -67,10 +67,10 @@ async function startStudio(required=false){
   if(typeof navigator!=='undefined'&&navigator.userActivation&&!navigator.userActivation.isActive){
    progress('브라우저에서 프로그램을 열려면 한 번 더 확인이 필요합니다. 아래 엔진 실행 허용을 눌러주세요.');manualLaunch();
   }else{launch();manualLaunch();}
-  const deadline=Date.now()+35000;
+  let deadline=Date.now()+120000;
   let misses=0;
-  while(current()&&Date.now()<deadline){
-   if(!launched){await new Promise(r=>setTimeout(r,1000));if(Date.now()>deadline-27000){showStartHelp('아직 엔진 실행이 허용되지 않았습니다. 다시 시도하거나 아래에서 상황에 맞는 항목을 선택하세요.');return;}continue;}
+  while(current()&&Date.now()<(launched?launchTime+120000:deadline)){
+   if(!launched){await new Promise(r=>setTimeout(r,1000));if(Date.now()>deadline-112000){showStartHelp('아직 엔진 실행이 허용되지 않았습니다. 다시 시도하거나 아래에서 상황에 맞는 항목을 선택하세요.');return;}continue;}
    try{
     const h=await sessionFetch('/health');if(!current())return;
     if(!compatible(h)){showStartHelp('호환되는 연결 엔진이 아닙니다. 연결 문제 해결에서 실행 상태를 확인하세요.');return}
@@ -82,7 +82,7 @@ async function startStudio(required=false){
    }catch(e){
     if(!current())return;
     if(e.status===403){misses=0;progress('엔진이 응답합니다. 로컬 사이트 승인 창이 나타났다면 주소를 확인하고 승인하세요.');}
-    else if(!pendingToken&&++misses>=2){showStartHelp('엔진이 응답하지 않습니다. 설치를 완료했다면 실행 승인·브라우저 권한을 확인하고 다시 연결하세요. 처음 설치하거나 설치 도중 실패했다면 최신 설치기를 받으세요.');return;}
+    else if(!pendingToken){misses++;if(misses===2)progress('엔진 준비를 기다리고 있습니다. 승인 창에서 예를 눌렀다면 다시 시작하지 말고 기다려주세요. 준비가 끝나면 자동 연결됩니다.');}
     await new Promise(r=>setTimeout(r,1000));
    }
   }

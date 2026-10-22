@@ -1,0 +1,207 @@
+{
+  "upload": "Upload folder CONTENTS to repository root",
+  "web": "1.4.1 + cold-start fix",
+  "installer": "1.4.0 corrected runtime check",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 248,
+      "sha256": "529d5a529bfcf848488844f535d03cfe35d74d4b6ca8992e276196e118474723"
+    },
+    {
+      "path": "2026-10-22-build-installer.ps1",
+      "bytes": 1703,
+      "sha256": "c676056d65d047592370fabd6ef313c6e9979efa40301baa5a32d5c87d266496"
+    },
+    {
+      "path": "2026-10-22-build.mjs",
+      "bytes": 1572,
+      "sha256": "ff1d0b88db8b12bc24fd341aab96d7da5d981245335a4d339532dedffd030488"
+    },
+    {
+      "path": "2026-10-22-GitHub-upload-guide.md",
+      "bytes": 298,
+      "sha256": "f23773f27c36e8366149405a0c8b14bcac54fe08880df5e9c20615e10da072ea"
+    },
+    {
+      "path": "2026-10-22-installer.cs",
+      "bytes": 7391,
+      "sha256": "e205b273edc7ae327bdbe86b18463e7109717e72835a503efdbff8e66e0b6dbe"
+    },
+    {
+      "path": "2026-10-22-session.js",
+      "bytes": 9659,
+      "sha256": "c2d013561ddc4dc3fccf96f53658fc7dec2e6f64f3d105eb731dad36620465f1"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-app.py",
+      "bytes": 5310,
+      "sha256": "2e34bdc61015b4f333477ca06d05424ffa3bd0a4b521ec0879fb3ebf8d4cf3dd"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-bridge.py",
+      "bytes": 6296,
+      "sha256": "7bcab805f48f480e63a2378840252290e5ce48bf5e6191d173ee368c6030a868"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-captions.py",
+      "bytes": 4353,
+      "sha256": "5dc86b89eaf8c2be1520e11a2ec278a20067014fa3fbf73d497d6334470b3454"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-core.py",
+      "bytes": 3296,
+      "sha256": "99dd9d16106ee09f365a76cc7c22129d5b6607ba6c3e1e92e27380aa702f6a7b"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-detect.py",
+      "bytes": 1568,
+      "sha256": "410eb8a7fcb4810b2e6700059e075058c50240fe44f291b5a5094e7616bffce8"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-engine-start.vbs",
+      "bytes": 813,
+      "sha256": "0c9f6b509a506a76df10c5038c562e4032a150a67dcbf3c55a53d3610cb6cdc3"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-engine.py",
+      "bytes": 17093,
+      "sha256": "fc3ba1a872e5492f5ae7e84fed7eb8198d8a21e72e41511c1e79d8526db3f0a4"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-install.ps1",
+      "bytes": 11634,
+      "sha256": "8a16feb7388a24a97123760db03b1e4d841390e01cae6c63e102db8bfac167c9"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-language-check.py",
+      "bytes": 3921,
+      "sha256": "1ee05b86f7c7ad95febcf3ae8253a05ef62f667dbc3aa5e506ee1e544f59b6de"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-launch.cmd",
+      "bytes": 108,
+      "sha256": "321795a2f671cf182d6473932abbfa871ac01c2894618c117fb0c6f7a43b43d9"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-launch.ps1",
+      "bytes": 6213,
+      "sha256": "43aebd1db88d6c90a8119661e2268ee5101bd9018e349022c098dd8eb98edc68"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-lifecycle.py",
+      "bytes": 1237,
+      "sha256": "6e44eeb8c4f1d6e38011111236d1b29893e0ab3ad0e71f9161c8d470c241750c"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-prepare.py",
+      "bytes": 194,
+      "sha256": "4fa727cee16a72b3a8265515462c21b6f25c9353707668466818d0a0d9f899a1"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-protocol.vbs",
+      "bytes": 546,
+      "sha256": "92fab2acf759eb3cf0742461a2500ca44959707b91ffa0fe49cee2f1af4c66d7"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-README.md",
+      "bytes": 2337,
+      "sha256": "02fc5a17d89b879995da46e9fcbd720af55be425fa6fc2fd05ff1f7cad5dee04"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-register.ps1",
+      "bytes": 1798,
+      "sha256": "1af63ecc302557376e4300d9df1d3470b87fa3e73ab6301dc5098a3585819293"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-repair.cmd",
+      "bytes": 219,
+      "sha256": "a889990807b2430cf9731d415a372305f81d06ef4d85aae89a379a33d6e12b4a"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-repair.ps1",
+      "bytes": 2123,
+      "sha256": "daaa9e8637314e0e0e08bf88dd4d31fe5b5e87697163e0188dbe28023947601e"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-requirements-lock.txt",
+      "bytes": 1385,
+      "sha256": "7f8f5dd10b52033e1a3c03819c80d0e6f299c7a8846a2a37576f803fbed60e7b"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-runtime-check.py",
+      "bytes": 289,
+      "sha256": "16dff46a9ddb661165675f31ce9b56d5c22ff0084ceeefab71af5edad119a71e"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-runtime-worker.py",
+      "bytes": 2776,
+      "sha256": "b234d1cf0946a94b343cb936098389afe9e2d2fed83925c8758a18db48169362"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-setup-ui.ps1",
+      "bytes": 1987,
+      "sha256": "f16d89257336c4ee2bc05be0714ad72d8c8fb25c5ea916ddedf30eab67c7f492"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-speakers.py",
+      "bytes": 1830,
+      "sha256": "88abbc2d79b4602e9034141377b9106b7ed66ba6c043d79b1079e0a83a22c205"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-third-party.md",
+      "bytes": 604,
+      "sha256": "17615d814082ca4e0183beb561f6249899bba26cb440f9bf88550ecf34c11ed8"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-tray.pyw",
+      "bytes": 201,
+      "sha256": "4e2cb2904f11c8a55f6cf882f3327bf6ede63d4ec7d089b1f538de529a5e8b01"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-ui.html",
+      "bytes": 45593,
+      "sha256": "47361997b18ae81859c1142f895e4bef9a2500ae051efb27c709f3e1652cc780"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-verify-engine.ps1",
+      "bytes": 2982,
+      "sha256": "57cf1c9156985a59c0a56da76815e729fbae05262c65f58509f6a86fbd8ff0bc"
+    },
+    {
+      "path": "2026-10-22-windows-source/2026-10-22-verify-setup.ps1",
+      "bytes": 1215,
+      "sha256": "1e7508f29633aa49e39123cf870cc322b30a0ab82aa4263bf85153a377bb296b"
+    },
+    {
+      "path": "downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe",
+      "bytes": 70144,
+      "sha256": "766d0a3873da96c802b09b0a7669e122ca9a8ef4035c5174df1b3d00a9a8ae32"
+    },
+    {
+      "path": "index.html",
+      "bytes": 52926,
+      "sha256": "84e37eae8d618aee5480581a6a72822a72df160bd58f27e7a4e8954c6c4d97b4"
+    },
+    {
+      "path": "manual.html",
+      "bytes": 13722,
+      "sha256": "5c87bec9897473487d27410309e8794a84d6785fa484e3a9dee2466e4267f95f"
+    },
+    {
+      "path": "og-image.png",
+      "bytes": 1264806,
+      "sha256": "9faa78550df87c2cb65cf15531470866f0b79a5a67cd07863f2a6255c7330014"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2067,
+      "sha256": "2a8bce0edd13106e96d950094f298e6fa24267266550995b65192593f24c3cec"
+    },
+    {
+      "path": "vercel.json",
+      "bytes": 271,
+      "sha256": "d05b926e51ada2f5d488a3a87d2726a648f5d088113fb3edfc9a06d4f79e1bba"
+    }
+  ]
+}
