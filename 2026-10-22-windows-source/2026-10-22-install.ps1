@@ -9,14 +9,14 @@ $probe=Join-Path $PSScriptRoot '2026-10-22-detect.py'
 $prior=$null
 try{
  $association=(Get-Item -LiteralPath 'HKCU:\Software\Classes\localvoicestudio\shell\open\command' -ErrorAction Stop).GetValue('')
- if($association -match '"([^"
-]*2026-10-22-protocol\.vbs)"'){
+ if($association -match '"([^"]*2026-10-22-protocol\.vbs)"'){
   $priorPath=Join-Path (Split-Path $Matches[1] -Parent) '2026-10-22-environment.json'
   if(Test-Path -LiteralPath $priorPath){$prior=Get-Content -LiteralPath $priorPath -Raw|ConvertFrom-Json}
  }
 }catch{}
 $candidates=@($PythonPath,(Join-Path $PSScriptRoot '2026-10-22-runtime\Scripts\python.exe'),(Join-Path (Split-Path $PSScriptRoot -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-runtime\Scripts\python.exe'))
 $candidates+=$prior.python
+$candidates+=Join-Path $env:LOCALAPPDATA 'LocalVoiceStudio\1.4.0\2026-10-22-runtime\Scripts\python.exe'
 $candidates+=Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-runtime\Scripts\python.exe'
 $command=Get-Command python -ErrorAction SilentlyContinue;if($command){$candidates+=$command.Source}
 $candidates+=Join-Path $env:LOCALAPPDATA 'Programs\Python\Python311\python.exe'
@@ -78,8 +78,8 @@ if(!$python){
 }
 # Check actual imports with all caches confined to the selected stores.
 $env:HF_HOME=$hf;$env:TORCH_HOME=$torch;$env:XDG_CACHE_HOME=$cache;$previousOffline=$env:HF_HUB_OFFLINE;$env:HF_HUB_OFFLINE='1'
-try{RunChecked $python @('-B','-c','import torch,chatterbox,whisper,soundfile,yt_dlp;print("Runtime imports OK")')}finally{$env:HF_HUB_OFFLINE=$previousOffline}
-if(!$ffmpeg){EnsureUv;RunChecked $uv @('pip','install','--python',$python,'--target',(Join-Path $tools 'ffmpeg-package'),'imageio-ffmpeg==0.6.0');$env:PYTHONPATH=Join-Path $tools 'ffmpeg-package';$ffmpegSource=(& $python -B -c 'import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())').Trim();$env:PYTHONPATH=$null;$ffmpeg=Join-Path $tools 'ffmpeg.exe';Copy-Item -LiteralPath $ffmpegSource -Destination $ffmpeg}
+try{RunChecked $python @('-B',(Join-Path $PSScriptRoot '2026-10-22-runtime-check.py'))}finally{$env:HF_HUB_OFFLINE=$previousOffline}
+if(!$ffmpeg){EnsureUv;RunChecked $uv @('pip','install','--python',$python,'--target',(Join-Path $tools 'ffmpeg-package'),'imageio-ffmpeg==0.6.0');$env:PYTHONPATH=Join-Path $tools 'ffmpeg-package';$ffmpegSource=(& $python -B (Join-Path $PSScriptRoot '2026-10-22-runtime-check.py') 'ffmpeg-path').Trim();$env:PYTHONPATH=$null;$ffmpeg=Join-Path $tools 'ffmpeg.exe';Copy-Item -LiteralPath $ffmpegSource -Destination $ffmpeg}
 if(!$external -and !$ollamaExe){$zip=Join-Path $env:TEMP 'ollama.zip';Download 'https://github.com/ollama/ollama/releases/latest/download/ollama-windows-amd64.zip' $zip;Expand-Archive -LiteralPath $zip -DestinationPath (Join-Path $tools 'ollama') -Force;$ollamaExe=Join-Path $tools 'ollama\ollama.exe'}
 $service=$null
 if(!$external){

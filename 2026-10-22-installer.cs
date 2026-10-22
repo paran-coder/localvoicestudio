@@ -22,7 +22,7 @@ class Setup : Form {
   if(zip.Entries.Count<20)throw new Exception("Incomplete payload");foreach(var e in zip.Entries){if(e.FullName.Contains("..")||e.FullName.Contains(":")||e.FullName.Contains("/"))throw new Exception("Invalid entry");using(var s=e.Open()){s.CopyTo(Stream.Null);}}
  }}
  Setup(){
-  Text="Local Voice Studio 설치 · 연결 복구";ClientSize=new Size(650,455);MinimumSize=new Size(666,494);StartPosition=FormStartPosition.CenterScreen;Font=new Font("Malgun Gothic",10);BackColor=Color.White;
+  Text="Local Voice Studio 설치 · 연결 복구 (검사 오류 수정본)";ClientSize=new Size(650,455);MinimumSize=new Size(666,494);StartPosition=FormStartPosition.CenterScreen;Font=new Font("Malgun Gothic",10);BackColor=Color.White;
   var title=new Label{Text="Local Voice Studio",Font=new Font(Font.FontFamily,20,FontStyle.Bold),Location=new Point(28,22),AutoSize=true};Controls.Add(title);
   var description=new Label{Text="설치 환경을 확인하고 웹 스튜디오 연결을 준비합니다.\n기존 Python·모델은 재사용합니다. 명령어를 입력할 필요가 없습니다.",Location=new Point(30,77),Size=new Size(590,52)};Controls.Add(description);
   status.Text="처음 사용하면 설치, 기존 사용자라면 연결 복구를 선택하세요.";status.SetBounds(30,142,590,54);Controls.Add(status);
@@ -35,11 +35,17 @@ class Setup : Form {
  }
  void Log(string line){if(line==null||IsDisposed)return;BeginInvoke((Action)(()=>details.AppendText(line+Environment.NewLine)));}
  void Extract(){
+  string backup=null;
   Directory.CreateDirectory(target);
   using(var stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("payload.zip"))using(var zip=new ZipArchive(stream,ZipArchiveMode.Read))foreach(var entry in zip.Entries){
    if(entry.FullName.Contains("..")||entry.FullName.Contains(":")||Path.GetFileName(entry.FullName)!=entry.FullName)throw new Exception("설치 패키지 경로 오류");
    string file=Path.Combine(target,entry.FullName);byte[] data;using(var m=new MemoryStream()){using(var z=entry.Open())z.CopyTo(m);data=m.ToArray();}
-   if(File.Exists(file)){using(var sha=SHA256.Create()){if(Convert.ToBase64String(sha.ComputeHash(File.ReadAllBytes(file)))!=Convert.ToBase64String(sha.ComputeHash(data)))throw new Exception("기존 프로그램 파일이 변경되어 보존했습니다: "+file+"\n새 설치 위치를 확인해야 합니다.");}}
+   if(File.Exists(file)){using(var sha=SHA256.Create()){if(Convert.ToBase64String(sha.ComputeHash(File.ReadAllBytes(file)))!=Convert.ToBase64String(sha.ComputeHash(data))){
+     var answer=(DialogResult)Invoke((Func<DialogResult>)(()=>MessageBox.Show(this,"설치 오류 수정에 필요한 프로그램 파일을 교체합니다.\n대상: "+file+"\n기존 파일은 백업합니다. 사용자 모델·결과 파일은 교체하지 않습니다.\n\n이 파일을 업데이트할까요?",Text,MessageBoxButtons.YesNo,MessageBoxIcon.Question)));
+     if(answer!=DialogResult.Yes)throw new OperationCanceledException("파일 교체를 취소했습니다. 기존 파일을 보존했습니다.");
+     if(backup==null){backup=Path.Combine(target,"2026-10-22-update-backup-"+DateTime.Now.ToString("yyyyMMdd-HHmmss-fff"));Directory.CreateDirectory(backup);}
+     File.Copy(file,Path.Combine(backup,entry.FullName),false);File.WriteAllBytes(file,data);
+    }}}
    else File.WriteAllBytes(file,data);
   }
  }
