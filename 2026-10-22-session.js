@@ -5,7 +5,7 @@ function connectionPanel(message,error=false,waiting=false){
  n.setAttribute('role',error?'alert':'status');const p=document.createElement('p');p.textContent=message;n.append(p);
  const actions=document.createElement('div');actions.className='connection-actions';
  const control=document.createElement('button');control.type='button';control.textContent=waiting?'시작 취소':'다시 시도';control.onclick=waiting?cancelStudioStart:()=>startStudio();actions.append(control);
- const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='설치·복구 안내';const download=document.createElement('a');download.className='secondary-button';download.href='./downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe';download.download='';download.textContent='Windows 설치·복구 프로그램';actions.append(download);actions.append(a);n.append(actions);
+ const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='자세한 안내';const download=document.createElement('a');download.className='secondary-button';download.href='./downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe';download.download='';download.textContent='설치 프로그램 다운로드';download.onclick=showDownloadSteps;const help=document.createElement('button');help.type='button';help.textContent='연결 문제 해결';help.onclick=showConnectionHelp;actions.append(help);actions.append(download);actions.append(a);n.append(actions);
  stage(message,error);
 }
 function showStartHelp(message){connectionPanel(message,true,false)}
@@ -29,7 +29,7 @@ async function startStudio(required=false){
  let pendingToken='',phase='';
  function progress(key,message){if(phase!==key&&attempt===startAttempt){phase=key;connectionPanel(message,false,true)}}
  startingStudio=true;$('engine-connect').disabled=true;$('engine-connect').textContent='앱 열기 확인…';
- progress('launch','1/3 · 브라우저의 앱 열기 확인을 허용하세요. 창이 뜨지 않아도 미설치로 단정할 수 없습니다. 아래 설치·복구 안내를 확인할 수 있습니다.');
+ progress('launch','로컬 엔진에 연결하고 있습니다. 앱 실행 확인 창이 나타나면 열기를 누르세요. 처음 사용한다면 시작 취소 후 위 안내에서 설치 프로그램을 다운로드하고, 받은 파일을 직접 열어 설치하세요.');
  try{
   // Keep URI activation in the initial click, before any asynchronous network probe.
   const a=document.createElement('a');a.href='localvoicestudio://start?origin='+encodeURIComponent(location.origin)+'&nonce='+nonce;a.hidden=true;document.body.append(a);a.click();a.remove();
@@ -37,7 +37,7 @@ async function startStudio(required=false){
    try{
     const health=await sessionFetch('/health');if(attempt!==startAttempt)return;
     if(health.service!=='local-voice-bridge'||health.protocol!==2||(health.version&&health.version!=='1.4.0')){showStartHelp('이전 버전 또는 다른 엔진이 응답합니다. 작업을 마친 뒤 기존 트레이 엔진을 종료하고 다시 시도하세요.');return}
-    progress('approval','2/3 · 엔진 응답을 확인했습니다. 로컬 승인 창에 표시된 사이트 주소를 확인하고 승인하세요.');
+    progress('approval','엔진이 응답했습니다. 로컬 승인 창에 표시된 사이트 주소를 확인하고 예를 선택하세요.');
     $('engine-connect').textContent='연결 승인 대기…';
     if(!pendingToken){const result=await sessionFetch('/connect',{nonce});pendingToken=result.token;}
     if(attempt!==startAttempt){if(pendingToken)sessionFetch('/release',{},pendingToken).catch(()=>{});return}
@@ -46,11 +46,11 @@ async function startStudio(required=false){
     if(attempt!==startAttempt){sessionFetch('/release',{},pendingToken).catch(()=>{});return}
     if(!serverReady)throw Error('승인 후 엔진 환경 확인에 실패했습니다.');
     $('engine-connect').textContent='엔진 연결됨';$('engine-connect').classList.add('connected');$('engine-disconnect').hidden=false;
-    $('connection-notice').hidden=true;$('error').textContent='';return;
+    $('connection-notice').hidden=true;$('error').textContent='';if($('onboarding'))$('onboarding').open=false;return;
    }catch(e){
     if(attempt!==startAttempt)return;
-    if(e.status===403&&!pendingToken)progress('approval','2/3 · 엔진이 응답합니다. 로컬 승인 창이 열려 있다면 사이트 주소를 확인하고 승인하세요. 창이 없으면 설치·연결 복구를 확인하세요.');
-    else if(Date.now()-started>=8000&&!pendingToken)progress('no-response','엔진 응답이 아직 없습니다. 앱 열기 취소, 실행 링크 미등록, 권한 차단, 구버전 실행 등이 원인일 수 있습니다. 설치·복구 안내를 열거나 취소 후 다시 시도하세요.');
+    if(e.status===403&&!pendingToken)progress('approval','엔진 연결 승인을 기다립니다. 로컬 승인 창이 보이면 사이트 주소를 확인하고 예를 선택하세요. 창이 보이지 않으면 연결 문제 해결을 누르세요.');
+    else if(Date.now()-started>=8000&&!pendingToken)progress('no-response','엔진이 아직 응답하지 않습니다. 처음 사용한다면 설치 프로그램을 다운로드한 뒤 받은 파일을 열어 설치하세요. 설치한 적이 있다면 연결 문제 해결을 선택하세요.');
     await new Promise(resolve=>setTimeout(resolve,1000));
    }
   }
@@ -76,3 +76,15 @@ window.addEventListener('pagehide',()=>{
  fetch(engineBase+'/release',{method:'POST',headers:{'Content-Type':'application/json','X-App-Token':token},body:'{}',keepalive:true,targetAddressSpace:'loopback'}).catch(()=>{});
 });
 window.addEventListener('pageshow',e=>{if(e.persisted)heartbeat()});window.addEventListener('focus',heartbeat);
+
+function showDownloadSteps(){
+ if(startingStudio)cancelStudioStart();
+ $('onboarding').open=true;
+ $('download-steps').textContent='다운로드가 끝나면 브라우저 다운로드 목록에서 받은 EXE 파일을 열어주세요. 설치 창에서 설치 시작을 선택하고, 완료 후 이 페이지의 스튜디오 시작을 누르세요.';
+}
+function showConnectionHelp(){
+ if(startingStudio)cancelStudioStart();
+ $('onboarding').open=true;
+ connectionPanel('이미 설치했다면 설치 프로그램을 열고 연결 복구를 선택하세요. 설치 프로그램이 없다면 아래에서 다시 다운로드해 실행할 수 있습니다. 다운로드 후에는 브라우저 다운로드 목록에서 파일을 직접 열어주세요. 복구가 끝나면 스튜디오 시작을 다시 누르세요.',true,false);
+ $('onboarding').scrollIntoView({behavior:'smooth',block:'start'});
+}
