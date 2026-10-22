@@ -5,7 +5,7 @@ function connectionPanel(message,error=false,waiting=false){
  n.setAttribute('role',error?'alert':'status');const p=document.createElement('p');p.textContent=message;n.append(p);
  const actions=document.createElement('div');actions.className='connection-actions';
  const control=document.createElement('button');control.type='button';control.textContent=waiting?'시작 취소':'다시 시도';control.onclick=waiting?cancelStudioStart:()=>startStudio();actions.append(control);
- const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='자세한 안내';const download=document.createElement('a');download.className='secondary-button';download.href='./downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe';download.download='';download.textContent='설치 프로그램 다운로드';download.onclick=showDownloadSteps;const help=document.createElement('button');help.type='button';help.textContent='연결 문제 해결';help.onclick=showConnectionHelp;if(!waiting&&error){download.textContent="처음 사용 · 설치하기";actions.append(help);actions.append(download);actions.append(a);}n.append(actions);
+ const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='자세한 안내';const download=document.createElement('a');download.className='secondary-button';download.href='./downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe';download.download='';download.textContent='설치 프로그램 다운로드';download.onclick=showDownloadSteps;const help=document.createElement('button');help.type='button';help.textContent='연결 문제 해결';help.onclick=showConnectionHelp;if(!waiting&&error){download.textContent="처음 사용 · 설치하기";help.textContent="설치했는데 실행 안 됨";actions.append(help);actions.append(download);}n.append(actions);
  stage(message,error);
 }
 function cancelStudioStart(){
@@ -21,7 +21,7 @@ async function sessionFetch(path,data,auth=''){
 }
 function showStartHelp(message){
  connectionPanel(message,true,false);
- $('onboarding').hidden=false;$('onboarding').hidden=false;$('onboarding').open=true;
+ $('onboarding').hidden=true;$('onboarding').open=false;
 }
 async function startStudio(required=false){
  if(startingStudio)return;
@@ -39,7 +39,7 @@ async function startStudio(required=false){
   progress('엔진 실행·연결을 요청했습니다. 앱 실행 확인 창이 나타나면 열기를 선택하세요. 이미 설치했다면 다시 설치할 필요는 없습니다.');
  }
  function manualLaunch(){
-  const b=document.createElement('button');b.type='button';b.textContent='엔진 실행 허용';b.onclick=()=>launch(true);$('connection-notice').append(b);
+  const b=document.createElement('button');b.type='button';b.textContent='엔진 실행 허용';b.onclick=()=>launch(true);b.className='engine-launch-action';$('connection-notice').querySelector('.connection-actions').append(b);
  }
  async function finish(auth){
   if(!current())return false;
@@ -68,8 +68,9 @@ async function startStudio(required=false){
    progress('브라우저에서 프로그램을 열려면 한 번 더 확인이 필요합니다. 아래 엔진 실행 허용을 눌러주세요.');manualLaunch();
   }else{launch();manualLaunch();}
   const deadline=Date.now()+35000;
+  let misses=0;
   while(current()&&Date.now()<deadline){
-   if(!launched){await new Promise(r=>setTimeout(r,1000));continue;}
+   if(!launched){await new Promise(r=>setTimeout(r,1000));if(Date.now()>deadline-27000){showStartHelp('아직 엔진 실행이 허용되지 않았습니다. 다시 시도하거나 아래에서 상황에 맞는 항목을 선택하세요.');return;}continue;}
    try{
     const h=await sessionFetch('/health');if(!current())return;
     if(!compatible(h)){showStartHelp('호환되는 연결 엔진이 아닙니다. 연결 문제 해결에서 실행 상태를 확인하세요.');return}
@@ -80,7 +81,8 @@ async function startStudio(required=false){
     if(await finish(pendingToken))return;
    }catch(e){
     if(!current())return;
-    if(e.status===403)progress('엔진이 응답합니다. 로컬 사이트 승인 창이 나타났다면 주소를 확인하고 승인하세요.');
+    if(e.status===403){misses=0;progress('엔진이 응답합니다. 로컬 사이트 승인 창이 나타났다면 주소를 확인하고 승인하세요.');}
+    else if(!pendingToken&&++misses>=2){showStartHelp('엔진이 응답하지 않습니다. 처음이라면 설치하기를, 설치한 적이 있다면 설치했는데 실행 안 됨을 선택하세요.');return;}
     await new Promise(r=>setTimeout(r,1000));
    }
   }
