@@ -54,5 +54,5 @@ try{
  if(!$ready){throw 'Ollama did not start.'}
  RunChecked $ollama @('pull','gemma4:latest')
 }finally{if(!$service.HasExited){Stop-Process -Id $service.Id}}
-Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'bootstrap-v1.0.0' -Encoding UTF8
+Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'bootstrap-web-v1.1.0' -Encoding Ascii
 Write-Host 'Setup complete. Run 2026-10-22-launch.cmd. CPU mode can be very slow.'

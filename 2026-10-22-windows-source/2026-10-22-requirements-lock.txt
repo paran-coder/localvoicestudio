@@ -74,3 +74,5 @@ yt-dlp==2026.8.19
 zipp==4.1.1
 imageio-ffmpeg==0.6.0
 setuptools<81
+pystray==0.19.5
+six==1.17.0

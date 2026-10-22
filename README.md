@@ -1,15 +1,8 @@
-# Local Voice Studio — GitHub / Vercel bundle v1.0.0
+# Local Voice Studio WEB / local engine v1.1.0
 
-이 폴더 내용 전체를 GitHub 저장소 루트에 업로드한다. Vercel에서 해당 repo를 Import: Framework Other, vercel.json의 빌드와public출력사용. GitHub 업로드/실제Vercel 배포는 아직 하지 않았다.
-
-- index.html: 소개·다운로드페이지. OG/Twitter태그 포함. 실제 더빙 UI는Windows앱에서 실행.
-- og-image.png: AI생성 OG공유이미지, 실제 크기는 이미지태그 참조.
-- downloads/: 사용자실행용 ZIP(소스와설치준비스크립트만,모델미포함).
-- 2026-10-22-windows-source/: ZIP과동일한Windows배포소스.
-- 2026-10-22-build.mjs: Vercel에서public생성.
-
-SITE_URL을 https://실제도메인 으로 설정하는것을 권장. 미설정시 VERCEL_PROJECT_PRODUCTION_URL,그다음 VERCEL_URL에서절대URL구성. 커스텀도메인변경시SITE_URL수정후재배포. 원본 index.html의__SITE_URL__은 빌드에서 치환된다. public산출물만배포한다. 로컬빌드 PowerShell: $env:SITE_URL='http://localhost:8787'; node 2026-10-22-build.mjs
-
-Windows패키지는깨끗한PC전체설치미검증인beta bootstrap. 인증서서명된EXE/MSI가아니며 ZIP압축해제후CMD실행. 현재최종본/모델/사용자결과는포함하지않는다. 원본앱코드의공개라이선스는소유자가지정해야하며 임의MIT등을부여하지않았다.
-
-공유미리보기실제반영은공개배포후확인. 현재라이브URL은미정.
+이폴더내용을GitHub저장소루트에업로드. Vercel Other + vercel.json, node 2026-10-22-build.mjs, output public.
+index.html=실제편집·더빙화면. manual.html=사용자매뉴얼. og-image.png=공유이미지. downloads=Windows로컬엔진ZIP. windows-source=동일소스.
+SITE_URL=https://공개도메인설정권장. 없으면VERCEL_PROJECT_PRODUCTION_URL/VERCEL_URL자동사용. 원본템플릿__SITE_URL__은빌드치환. public/은gitignore대상.
+웹:로컬엔진연결확인→트레이코드입력→작업. 엔진http://127.0.0.1:8766, Ollama11435. 첫설치YES동의후Python/패키지/FFmpeg/Ollama/번역모델준비, TTS/STT모델은처음사용시다운로드. 설치후engine-start.vbs로콘솔없이트레이시작.
+HTTPS→loopback브라우저권한은지원브라우저에서허용필요. 보안플래그/인증서검증을끄지말것. Origin별세션인증/코드페어링, 파일도인증필요. 토큰은브라우저메모리에만유지.
+검증:로컬HTTP웹→실제bridge페어링/무음작업/결과다운로드, CORS·인증거부확인. 미검증:다른PC전체설치,실제tray종합,공개HTTPS브라우저권한/배포,전체TTS. 기존최종앱보존. 새패키지는서명EXE아닌bootstrapZIP.
