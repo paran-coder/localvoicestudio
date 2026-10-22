@@ -14,7 +14,9 @@ spec=importlib.util.spec_from_file_location('bridge',ROOT/'2026-10-22-bridge.py'
 for key in ['HF_HOME','TORCH_HOME']:os.environ[key]=config[key.lower()]
 os.environ['TEMP']=os.environ['TMP']=str(temp);tempfile.tempdir=str(temp)
 original_request=b.app.engine.request_json
-def request(url,payload,headers=None):return original_request(url.replace('http://127.0.0.1:11435',config['ollama_url']),payload,headers)
+def request(url,payload,headers=None):
+ if isinstance(payload,dict) and '/api/' in url:payload={**payload,'keep_alive':0}
+ return original_request(url.replace('http://127.0.0.1:11435',config['ollama_url']),payload,headers)
 b.app.engine.request_json=request
 import whisper
 load_model=whisper.load_model
@@ -36,11 +38,5 @@ for node in ast.walk(tree):
   node.value=ast.BoolOp(op=ast.And(),values=[ast.Compare(left=ast.Name(id='S',ctx=ast.Load()),ops=[ast.Gt()],comparators=[ast.Constant(5)]),node.value])
 ast.fix_missing_locations(tree);scope={};exec(compile(tree,'<local-compatibility-guard>','exec'),method.__globals__,scope);AlignmentStreamAnalyzer.step=scope['step']
 server=b.serve()
-info=ROOT/'2026-10-22-cache/2026-10-22-session.json'
-def update():
- import time
- while True:
-  target=info.with_suffix('.tmp');target.write_text(json.dumps({'pid':os.getpid(),'code':b.code,'active_jobs':sum(j['state'] in ('queued','running') for j in b.app.jobs.values())}),encoding='utf-8');target.replace(info);time.sleep(1)
-threading.Thread(target=update,daemon=True).start()
 try:server.serve_forever()
 finally:server.server_close()

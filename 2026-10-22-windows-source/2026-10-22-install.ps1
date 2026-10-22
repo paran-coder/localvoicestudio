@@ -7,6 +7,7 @@ $cache=Join-Path $PSScriptRoot '2026-10-22-cache'
 $tools=Join-Path $PSScriptRoot '2026-10-22-tools'
 $probe=Join-Path $PSScriptRoot '2026-10-22-detect.py'
 $candidates=@($PythonPath,(Join-Path $PSScriptRoot '2026-10-22-runtime\Scripts\python.exe'),(Join-Path (Split-Path $PSScriptRoot -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-runtime\Scripts\python.exe'))
+$candidates+=Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-runtime\Scripts\python.exe'
 $command=Get-Command python -ErrorAction SilentlyContinue;if($command){$candidates+=$command.Source}
 $candidates+=Join-Path $env:LOCALAPPDATA 'Programs\Python\Python311\python.exe'
 foreach($key in @('HKCU:\Software\Python\PythonCore\3.11\InstallPath','HKLM:\Software\Python\PythonCore\3.11\InstallPath')){if(Test-Path $key){try{$installPath=(Get-Item $key).GetValue('');if($installPath){$candidates+=Join-Path $installPath 'python.exe'}}catch{}}}
@@ -29,6 +30,7 @@ $stores=@($env:OLLAMA_MODELS,(Join-Path $HOME '.ollama\models'),$models)|Where-O
 if(!$external){foreach($store in $stores){if(Test-Path -LiteralPath (Join-Path $store 'manifests\registry.ollama.ai\library\gemma4\latest')){$models=$store;$hasModel=$true;break}}}
 $hf=Join-Path $cache 'huggingface';$whisper=Join-Path $cache 'whisper';$torch=Join-Path $cache 'torch'
 $oldCache=Join-Path (Split-Path $PSScriptRoot -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-cache'
+if(!(Test-Path -LiteralPath $oldCache)){$nestedCache=Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '2026-10-22-Local-AI-TTS-v1.0.0\2026-10-22-cache';if(Test-Path -LiteralPath $nestedCache){$oldCache=$nestedCache}}
 $hfStores=@($env:HF_HOME,(Join-Path $oldCache 'huggingface'),(Join-Path $HOME '.cache\huggingface'),$hf)|Where-Object{$_}|Select-Object -Unique
 foreach($store in $hfStores){$snapshots=Join-Path $store 'hub\models--ResembleAI--chatterbox\snapshots';if(Test-Path -LiteralPath $snapshots){$complete=Get-ChildItem -LiteralPath $snapshots -Directory|Where-Object{(Test-Path -LiteralPath (Join-Path $_.FullName 't3_mtl23ls_v2.safetensors')) -and (Test-Path -LiteralPath (Join-Path $_.FullName 's3gen.pt')) -and (Test-Path -LiteralPath (Join-Path $_.FullName 've.pt')) -and (Test-Path -LiteralPath (Join-Path $_.FullName 'grapheme_mtl_merged_expanded_v1.json'))};if($complete){$hf=$store;break}}}
 foreach($store in @((Join-Path $oldCache 'whisper'),(Join-Path $HOME '.cache\whisper'),$whisper)){if(Test-Path -LiteralPath (Join-Path $store 'tiny.pt')){$whisper=$store;break}}
@@ -36,6 +38,7 @@ if(Test-Path -LiteralPath (Join-Path $oldCache 'torch')){$torch=Join-Path $oldCa
 $plan=[ordered]@{python=$python;base_python=$base;runtime_action=$(if($python){'reuse compatible existing environment (no package changes)'}elseif($base){'reuse Python 3.11; isolated venv inherits packages; install only incompatible/missing pins'}else{'download Python 3.11; isolated runtime'});ffmpeg=$ffmpeg;ffmpeg_action=$(if($ffmpeg){'reuse'}else{'install app-local FFmpeg'});ollama_binary=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_model_present=$hasModel;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
 $plan|ConvertTo-Json -Depth 5|Write-Output
 if($CheckOnly){return}
+& (Join-Path $PSScriptRoot '2026-10-22-register.ps1') -CheckOnly
 if((Read-Host 'Reuse items shown above; install ONLY missing items? Type YES') -cne 'YES'){return}
 New-Item -ItemType Directory -Force -Path $cache,$tools,(Join-Path $cache 'temp')|Out-Null
 $env:TEMP=Join-Path $cache 'temp';$env:TMP=$env:TEMP
@@ -71,7 +74,10 @@ if(!$external){
  $service=Start-Process -FilePath $ollamaExe -ArgumentList 'serve' -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $env:TEMP 'ollama-install-output.log') -RedirectStandardError (Join-Path $env:TEMP 'ollama-install-error.log')
  try{$ready=$false;for($i=0;$i -lt 30;$i++){try{$tags=Invoke-RestMethod "$ollamaUrl/api/tags" -TimeoutSec 2;$ready=$true;break}catch{Start-Sleep -Seconds 1}};if(!$ready){throw 'Ollama did not start'};if(!(@($tags.models.name) -contains 'gemma4:latest')){RunChecked $ollamaExe @('pull','gemma4:latest')}}finally{if($service -and !$service.HasExited){Stop-Process -Id $service.Id}}
 }
-$config=[ordered]@{version='reuse-v1.2.0';python=$python;ffmpeg=$ffmpeg;ollama_exe=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
+$config=[ordered]@{version='on-demand-v1.3.0';python=$python;ffmpeg=$ffmpeg;ollama_exe=$ollamaExe;ollama_url=$ollamaUrl;ollama_external=$external;ollama_models=$models;hf_home=$hf;whisper_home=$whisper;torch_home=$torch}
 $config|ConvertTo-Json -Depth 5|Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-environment.json') -Encoding UTF8
-Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'reuse-v1.2.0' -Encoding Ascii
+Set-Content -LiteralPath (Join-Path $PSScriptRoot '2026-10-22-installed.txt') -Value 'on-demand-v1.3.0' -Encoding Ascii
 Write-Host 'Ready. Existing environments were not overwritten.'
+
+& (Join-Path $PSScriptRoot '2026-10-22-register.ps1')
+Write-Host 'Setup complete. Return to the website and click Studio Start. No background engine was started.'

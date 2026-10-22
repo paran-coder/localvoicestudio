@@ -13,3 +13,5 @@ await cp(path.join(root,'downloads'),path.join(out,'downloads'),{recursive:true}
 await writeFile(path.join(out,'robots.txt'),'User-agent: *\nAllow: /\nSitemap: '+origin+'/sitemap.xml\n');
 await writeFile(path.join(out,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>'+origin+'/</loc></url></urlset>');
 console.log('Built static website for '+origin);
+
+await copyFile(path.join(root,'2026-10-22-session.js'),path.join(out,'2026-10-22-session.js'));

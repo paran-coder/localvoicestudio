@@ -1,14 +1,17 @@
-# Local Voice Studio WEB / local engine v1.1.0
+# Local Voice Studio v1.3.0
 
-이폴더내용을GitHub저장소루트에업로드. Vercel Other + vercel.json, node 2026-10-22-build.mjs, output public.
-index.html=실제편집·더빙화면. manual.html=사용자매뉴얼. og-image.png=공유이미지. downloads=Windows로컬엔진ZIP. windows-source=동일소스.
-SITE_URL=https://공개도메인설정권장. 없으면VERCEL_PROJECT_PRODUCTION_URL/VERCEL_URL자동사용. 원본템플릿__SITE_URL__은빌드치환. public/은gitignore대상.
-웹:로컬엔진연결확인→트레이코드입력→작업. 엔진http://127.0.0.1:8766, Ollama11435. 첫설치YES동의후Python/패키지/FFmpeg/Ollama/번역모델준비, TTS/STT모델은처음사용시다운로드. 설치후engine-start.vbs로콘솔없이트레이시작.
-HTTPS→loopback브라우저권한은지원브라우저에서허용필요. 보안플래그/인증서검증을끄지말것. Origin별세션인증/코드페어링, 파일도인증필요. 토큰은브라우저메모리에만유지.
-검증:로컬HTTP웹→실제bridge페어링/무음작업/결과다운로드, CORS·인증거부확인. 미검증:다른PC전체설치,실제tray종합,공개HTTPS브라우저권한/배포,전체TTS. 기존최종앱보존. 새패키지는서명EXE아닌bootstrapZIP.
+이 폴더 안의 내용을 GitHub 저장소 루트에 올리세요. 이전 v1.0.0 웹 폴더와 Windows 작업 폴더는 함께 업로드하지 않습니다.
 
-## WEB v1.1.1
-큰 연결패널삭제. 편집화면상단버튼→별도매뉴얼창에서연결. 엔진발견후에만코드입력. postMessage는동일Origin/정확한매뉴얼창source만허용하며토큰은메모리보관. 원래편집창을유지해대본/화자/선택파일유지. 미연결추출/번역/생성은매뉴얼안내. 로컬수동편집은연결없이가능. ZIP1.1.1은설명서업데이트이며엔진프로토콜1.1.0유지.
+- index.html / 2026-10-22-session.js: 편집 화면, 사용자 시작, 탭별 연결 유지
+- manual.html / og-image.png: 매뉴얼·설치 안내·공유 이미지
+- downloads/: 사용자용 Windows v1.3.0 ZIP
+- 2026-10-22-windows-source/: 설치 ZIP과 동일한 엔진 소스
+- vercel.json / 2026-10-22-build.mjs / .gitignore: Vercel 빌드 설정
 
-## Windows package v1.2.0
-설치기에서 기존 환경·모델을 탐지해 호환 항목을 재사용하고 부족한 항목만 준비합니다. 기존 환경 덮어쓰기 없음. 설정은 environment.json에 저장하며 Git에 제외합니다. 새 실행기는 pystray 대신 Windows 기본 트레이를 사용합니다. 현재 PC 탐지/단위 검사만 검증했으며 실제 설치 적용은 미검증입니다.
+Vercel 프로젝트 루트는 이 폴더이며 빌드 결과는 public입니다. 실제 도메인을 SITE_URL로 설정하거나 Vercel 자동 도메인을 사용합니다.
+
+최초 설치기는 호환 환경을 재사용하고 Windows 사용자별 실행 링크를 등록합니다. 웹의 스튜디오 시작 → 브라우저 앱 열기 확인 → 로컬 사이트 승인 → 연결 순서입니다. 트레이·연결 코드·시작 프로그램은 없습니다. 마지막 탭의 연결 신호가 끊기면 약 3분 이내, 진행 작업이 끝난 뒤 종료합니다. 설치 확인을 위해 프로그램을 임의 자동 실행하거나 다운로드하지 않습니다.
+
+기존 외부 Ollama와 이전 8765 앱은 유지합니다. 기존 v1.2 트레이 엔진이 8766을 사용 중이면 사용자가 해당 트레이에서 먼저 종료해야 합니다. 이전 실행 링크가 다른 경로에 등록돼 있으면 설치기가 덮어쓰지 않고 안내합니다.
+
+배포 시 개인 음성·모델·캐시·환경 설정은 포함하지 마세요. 기본 .gitignore가 해당 항목을 제외합니다. 새 PC 전체 설치와 공개 HTTPS에서 앱 실행·로컬 네트워크 권한 흐름은 별도 실사용 검증 대상입니다.
