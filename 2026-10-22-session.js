@@ -5,7 +5,7 @@ function connectionPanel(message,error=false,waiting=false){
  n.setAttribute('role',error?'alert':'status');const p=document.createElement('p');p.textContent=message;n.append(p);
  const actions=document.createElement('div');actions.className='connection-actions';
  const control=document.createElement('button');control.type='button';control.textContent=waiting?'시작 취소':'다시 시도';control.onclick=waiting?cancelStudioStart:()=>startStudio();actions.append(control);
- const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='처음 설치 / 기존 설치 복구';actions.append(a);n.append(actions);
+ const a=document.createElement('a');a.className='secondary-button';a.href='./manual.html#install';a.target='_blank';a.rel='noopener';a.textContent='설치·복구 안내';const download=document.createElement('a');download.className='secondary-button';download.href='./downloads/2026-10-22-Local-Voice-Studio-Setup-v1.4.0.exe';download.download='';download.textContent='Windows 설치·복구 프로그램';actions.append(download);actions.append(a);n.append(actions);
  stage(message,error);
 }
 function showStartHelp(message){connectionPanel(message,true,false)}
@@ -36,7 +36,7 @@ async function startStudio(required=false){
   while(Date.now()<deadline&&attempt===startAttempt){
    try{
     const health=await sessionFetch('/health');if(attempt!==startAttempt)return;
-    if(health.service!=='local-voice-bridge'||health.protocol!==2||(health.version&&health.version!=='1.3.1')){showStartHelp('이전 버전 또는 다른 엔진이 응답합니다. 작업을 마친 뒤 기존 트레이 엔진을 종료하고 다시 시도하세요.');return}
+    if(health.service!=='local-voice-bridge'||health.protocol!==2||(health.version&&health.version!=='1.4.0')){showStartHelp('이전 버전 또는 다른 엔진이 응답합니다. 작업을 마친 뒤 기존 트레이 엔진을 종료하고 다시 시도하세요.');return}
     progress('approval','2/3 · 엔진 응답을 확인했습니다. 로컬 승인 창에 표시된 사이트 주소를 확인하고 승인하세요.');
     $('engine-connect').textContent='연결 승인 대기…';
     if(!pendingToken){const result=await sessionFetch('/connect',{nonce});pendingToken=result.token;}
@@ -54,7 +54,7 @@ async function startStudio(required=false){
     await new Promise(resolve=>setTimeout(resolve,1000));
    }
   }
-  if(attempt===startAttempt){if(pendingToken)sessionFetch('/release',{},pendingToken).catch(()=>{});showStartHelp('45초 안에 연결을 완료하지 못했습니다. 계속 기다리지 않아도 됩니다. 처음 사용자는 설치하고, 기존 사용자는 패키지의 연결 복구를 실행해 주세요. 브라우저의 로컬 네트워크 권한도 확인하세요.');}
+  if(attempt===startAttempt){if(pendingToken)sessionFetch('/release',{},pendingToken).catch(()=>{});showStartHelp('45초 안에 연결을 완료하지 못했습니다. 계속 기다리지 않아도 됩니다. 처음 사용자는 설치하고, 기존 사용자도 아래 설치·복구 프로그램에서 연결 복구를 선택하세요. 브라우저의 로컬 네트워크 권한도 확인하세요.');}
  }finally{
   if(attempt===startAttempt){startingStudio=false;$('engine-connect').disabled=false;if(!serverReady)$('engine-connect').textContent='스튜디오 시작'}
  }

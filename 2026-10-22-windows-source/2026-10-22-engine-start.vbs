@@ -5,7 +5,7 @@ marker = fs.BuildPath(folder, "2026-10-22-installed.txt")
 ready = False
 If fs.FileExists(marker) Then
  Set stream = fs.OpenTextFile(marker, 1, False, 0)
- ready = (Trim(stream.ReadAll) = "on-demand-v1.3.1")
+ ready = (Trim(stream.ReadAll) = "on-demand-v1.4.0")
  stream.Close
 End If
 If Not fs.FileExists(fs.BuildPath(folder, "2026-10-22-environment.json")) Then

@@ -24,7 +24,7 @@ try{
  if(!$status.python){throw 'Authenticated status response is invalid.'}
  Invoke-RestMethod ($base+'/lease') -Method Post -Headers $headers -ContentType 'application/json' -Body '{}' -TimeoutSec 5|Out-Null
  Invoke-RestMethod ($base+'/release') -Method Post -Headers $headers -ContentType 'application/json' -Body '{}' -TimeoutSec 5|Out-Null
- @{stage='local-ready';local_verified=$true;browser_verified=$false;checked_at=[DateTimeOffset]::UtcNow.ToString('o');version='1.3.1'}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $cache '2026-10-22-readiness.json') -Encoding UTF8
+ @{stage='local-ready';local_verified=$true;browser_verified=$false;checked_at=[DateTimeOffset]::UtcNow.ToString('o');version='1.4.0'}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $cache '2026-10-22-readiness.json') -Encoding UTF8
  Write-Host 'Engine checks passed: startup and authenticated connection. This standalone diagnostic does not verify URI registration. Browser activation is NOT verified yet. Return to the website and click Studio Start.'
 }finally{
  if($child -and !$child.HasExited){Stop-Process -Id $child.Id}

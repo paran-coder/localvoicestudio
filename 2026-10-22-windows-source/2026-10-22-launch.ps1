@@ -19,7 +19,7 @@ try{
  $answer=[System.Windows.Forms.MessageBox]::Show("Allow this website to use the local dubbing engine?`n`n$($launch.origin)`n`nNo installation is performed. Engine exits when studio tabs are inactive and jobs finish.",'Local Voice Studio - Approve website','YesNo','Question')
  if($answer -ne 'Yes'){return}
  $configPath=Join-Path $PSScriptRoot '2026-10-22-environment.json'
- if(!(Test-Path -LiteralPath $configPath)){throw 'Initial setup is missing. Run 2026-10-22-launch.cmd once. No package was installed by this launch.'}
+ if(!(Test-Path -LiteralPath $configPath)){throw 'Initial setup is missing. 설치·복구 프로그램에서 연결 복구를 선택하세요. No package was installed by this launch.'}
  $config=Get-Content -LiteralPath $configPath -Raw|ConvertFrom-Json
  $cache=Join-Path $PSScriptRoot '2026-10-22-cache'
  $tickets=Join-Path $cache 'tickets'

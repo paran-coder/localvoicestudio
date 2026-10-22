@@ -48,7 +48,7 @@ class Handler(app.Handler):
    return bool(supplied) and any(secrets.compare_digest(supplied,token) and (not origin or origin==allowed) for token,allowed in sessions.items())
  def do_GET(self):
   if not self.trusted():return self.reply(403,{'error':'Host 오류'})
-  if self.path=='/health':return self.reply(200,{'service':'local-voice-bridge','protocol':2,'lifetime':'tab-leases','version':'1.3.1','installation':hashlib.sha256(str(ROOT).lower().encode()).hexdigest(),'port':PORT})
+  if self.path=='/health':return self.reply(200,{'service':'local-voice-bridge','protocol':2,'lifetime':'tab-leases','version':'1.4.0','installation':hashlib.sha256(str(ROOT).lower().encode()).hexdigest(),'port':PORT})
   if not self.authenticated():return self.reply(401,{'error':'스튜디오 시작 버튼으로 엔진을 연결하세요.'})
   if self.path=='/':return self.reply(404,{'error':'웹 편집 화면에서 사용하세요.'})
   return super().do_GET()
@@ -68,7 +68,7 @@ class Handler(app.Handler):
      token=secrets.token_urlsafe(32);sessions[token]=origin;leases.touch(token)
     if ticket.get('purpose')!='setup':
      try:
-      (ROOT/'2026-10-22-cache/2026-10-22-readiness.json').write_text(json.dumps({'stage':'web-connected','local_verified':True,'browser_verified':True,'origin':origin,'checked_at':time.time(),'version':'1.3.1'}),encoding='utf-8')
+      (ROOT/'2026-10-22-cache/2026-10-22-readiness.json').write_text(json.dumps({'stage':'web-connected','local_verified':True,'browser_verified':True,'origin':origin,'checked_at':time.time(),'version':'1.4.0'}),encoding='utf-8')
      except OSError:pass
     return self.reply(200,{'token':token,'lease_seconds':180})
    except (ValueError,TypeError):return self.reply(400,{'error':'연결 요청 형식 오류'})
